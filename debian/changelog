@@ -1,0 +1,5 @@
+intel-opencl-clang (0+git20190204-1) UNRELEASED; urgency=medium
+
+  * Initial release (Closes: #921426)
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Mon, 04 Feb 2019 11:15:41 +0200
