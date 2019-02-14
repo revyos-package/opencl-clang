@@ -16,7 +16,7 @@ Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
 Vcs-Git: https://salsa.debian.org/opencl-team/intel-opencl-clang.git
 
 Package: libopencl-clang8
-Architecture: any
+Architecture: amd64 i386
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: thin wrapper for clang
  Opencl-clang is a thin wrapper library around clang. It has an
