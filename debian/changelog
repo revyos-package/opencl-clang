@@ -3,6 +3,7 @@ intel-opencl-clang (0+git20190307-1) UNRELEASED; urgency=medium
   * Sync with ocl-open-80 -branch.
   * control: Add homepage.
   * control: Limit to amd64, i386.
+  * control: Build with clang-8.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 14 Feb 2019 16:31:46 +0200
 

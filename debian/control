@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
 Uploaders: Timo Aaltonen <tjaalton@debian.org>
 Build-Depends: debhelper (>= 11),
- clang-7,
+ clang-8,
  cmake,
  git,
  libclang-8-dev,
