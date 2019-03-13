@@ -7,6 +7,8 @@ include /usr/share/dpkg/pkg-info.mk
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+		-DLLVMSPIRV_INCLUDED_IN_LLVM=OFF \
+		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
 		-DCMAKE_SKIP_RPATH=true
 
 override_dh_missing:
