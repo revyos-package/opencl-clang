@@ -7,6 +7,7 @@ intel-opencl-clang (0+git20190307-1) UNRELEASED; urgency=medium
   * Rename binaries back to libcommon-clang*.
   * control: Add libedit-dev and zlib1g-dev to build-depends.
   * rules: Fix build against libllvmspirvlib.
+  * control: Bump build-dep on libllvmspirvlib-dev.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 14 Feb 2019 16:31:46 +0200
 
