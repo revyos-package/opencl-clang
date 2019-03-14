@@ -1,4 +1,4 @@
-intel-opencl-clang (0+git20190307-1) UNRELEASED; urgency=medium
+intel-opencl-clang (0+git20190307-1) experimental; urgency=medium
 
   * Sync with ocl-open-80 -branch.
   * control: Add homepage.
@@ -9,7 +9,7 @@ intel-opencl-clang (0+git20190307-1) UNRELEASED; urgency=medium
   * rules: Fix build against libllvmspirvlib.
   * control: Bump build-dep on libllvmspirvlib-dev.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Thu, 14 Feb 2019 16:31:46 +0200
+ -- Timo Aaltonen <tjaalton@debian.org>  Thu, 14 Mar 2019 23:56:37 +0200
 
 intel-opencl-clang (0+git20190204-1) experimental; urgency=medium
 
