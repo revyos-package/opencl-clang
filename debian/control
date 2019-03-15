@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 11),
  git,
  libclang-8-dev,
  libedit-dev,
- libllvmspirvlib-dev (>= 8.0.0-2~),
+ libllvmspirvlib-dev (>= 8.0.0-3~),
  llvm-8-dev,
  zlib1g-dev,
 Standards-Version: 4.3.0
