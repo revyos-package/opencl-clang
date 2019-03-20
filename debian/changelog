@@ -2,17 +2,11 @@ intel-opencl-clang (0+git20190318-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
   * Build against libllvmspirvlib8.
-
- -- Timo Aaltonen <tjaalton@debian.org>  Tue, 19 Mar 2019 21:38:57 +0200
-
-intel-opencl-clang (0+git20190307-1) experimental; urgency=medium
-
   * Sync with ocl-open-80 -branch.
   * control: Add homepage.
   * control: Limit to amd64, i386.
   * control: Build with clang-8.
   * Rename binaries back to libcommon-clang*.
-  * control: Add libedit-dev and zlib1g-dev to build-depends.
   * rules: Fix build against libllvmspirvlib.
   * control: Bump build-dep on libllvmspirvlib-dev.
 

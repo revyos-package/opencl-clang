@@ -8,10 +8,8 @@ Build-Depends: debhelper (>= 11),
  cmake,
  git,
  libclang-8-dev,
- libedit-dev,
  libllvmspirvlib-dev (>= 8.0.0+git20190314-1~),
  llvm-8-dev,
- zlib1g-dev,
 Standards-Version: 4.3.0
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
