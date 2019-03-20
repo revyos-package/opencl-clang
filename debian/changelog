@@ -1,5 +1,6 @@
-intel-opencl-clang (0+git20190307-2) UNRELEASED; urgency=medium
+intel-opencl-clang (0+git20190318-1) UNRELEASED; urgency=medium
 
+  * New upstream snapshot.
   * Build against libllvmspirvlib8.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Tue, 19 Mar 2019 21:38:57 +0200
