@@ -1,5 +1,5 @@
 project( common_clang )
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.4.3)
 
 # Do not omit TARGET_OBJECTS expression from the SOURCES target
 # property
@@ -81,10 +81,10 @@ set(TARGET_NAME ${COMMON_CLANG_LIBRARY_NAME}${BUILD_PLATFORM} )
 if(NOT USE_PREBUILT_LLVM)
     set(TARGET_BRANCH "ocl-open-80")
     set(CLANG_SOURCE_DIR ${LLVM_SOURCE_DIR}/tools/clang)
-    set(CLANG_BASE_REVISION e7524422bf4ee02f80a528547cde7e45b30c83dc)
+    set(CLANG_BASE_REVISION a03da8be08a208122e292016cb6cea1f30229677)
 
     set(SPIRV_SOURCE_DIR ${LLVM_SOURCE_DIR}/projects/llvm-spirv)
-    set(SPIRV_BASE_REVISION 0650ff887b5ef00066e6a0527bab592dafd59c83)
+    set(SPIRV_BASE_REVISION 049776f815b12525dcd7a0869e0ee68a70d01b92)
 
     apply_patches(${CLANG_SOURCE_DIR}
                   ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
