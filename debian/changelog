@@ -1,4 +1,4 @@
-intel-opencl-clang (0+git20190318-1) UNRELEASED; urgency=medium
+intel-opencl-clang (0+git20190318-1) experimental; urgency=medium
 
   * New upstream snapshot.
   * Build against libllvmspirvlib8.
@@ -10,7 +10,7 @@ intel-opencl-clang (0+git20190318-1) UNRELEASED; urgency=medium
   * rules: Fix build against libllvmspirvlib.
   * control: Bump build-dep on libllvmspirvlib-dev.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Thu, 14 Mar 2019 23:56:37 +0200
+ -- Timo Aaltonen <tjaalton@debian.org>  Wed, 20 Mar 2019 18:31:35 +0200
 
 intel-opencl-clang (0+git20190204-1) experimental; urgency=medium
 
