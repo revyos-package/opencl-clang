@@ -4,12 +4,12 @@ Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
 Uploaders: Timo Aaltonen <tjaalton@debian.org>
 Build-Depends: debhelper (>= 11),
- clang-8,
+ clang-8 (>= 1:8-2~),
  cmake,
  git,
- libclang-8-dev,
+ libclang-8-dev (>= 1:8-2~),
  libllvmspirvlib-dev (>= 8.0.0+git20190314-1~),
- llvm-8-dev,
+ llvm-8-dev (>= 1:8-2~),
 Standards-Version: 4.3.0
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
