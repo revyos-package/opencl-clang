@@ -1,4 +1,4 @@
-intel-opencl-clang (8.0.0-1) UNRELEASED; urgency=medium
+intel-opencl-clang (8.0.0-1) experimental; urgency=medium
 
   * New upstream release.
   * control: Bump build-dep on llvm/clang.
@@ -7,7 +7,7 @@ intel-opencl-clang (8.0.0-1) UNRELEASED; urgency=medium
   * dlopen-soname.diff: Make sure the soname is opened instead of linker
     name.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Wed, 27 Mar 2019 13:41:40 +0200
+ -- Timo Aaltonen <tjaalton@debian.org>  Mon, 08 Apr 2019 16:14:20 +0300
 
 intel-opencl-clang (0+git20190318-1) experimental; urgency=medium
 
