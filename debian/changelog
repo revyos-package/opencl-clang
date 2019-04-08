@@ -3,6 +3,7 @@ intel-opencl-clang (8.0.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * control: Bump build-dep on llvm/clang.
   * watch: Added.
+  * Follow upstream and rename binaries.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 27 Mar 2019 13:41:40 +0200
 

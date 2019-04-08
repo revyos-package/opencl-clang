@@ -9,6 +9,7 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
 		-DLLVMSPIRV_INCLUDED_IN_LLVM=OFF \
 		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
+		-DCOMMON_CLANG_LIBRARY_NAME=opencl-clang \
 		-DCMAKE_SKIP_RPATH=true
 
 override_dh_missing:
