@@ -74,17 +74,17 @@ endif (WIN32)
 
 # set that name of the main output file as a target name
 if (NOT DEFINED COMMON_CLANG_LIBRARY_NAME)
-    set(COMMON_CLANG_LIBRARY_NAME common_clang)
+    set(COMMON_CLANG_LIBRARY_NAME "opencl-clang")
 endif()
 set(TARGET_NAME ${COMMON_CLANG_LIBRARY_NAME}${BUILD_PLATFORM} )
 
 if(NOT USE_PREBUILT_LLVM)
     set(TARGET_BRANCH "ocl-open-80")
     set(CLANG_SOURCE_DIR ${LLVM_SOURCE_DIR}/tools/clang)
-    set(CLANG_BASE_REVISION a03da8be08a208122e292016cb6cea1f30229677)
+    set(CLANG_BASE_REVISION ccfe04576c13497b9c422ceef0b6efe99077a392)
 
     set(SPIRV_SOURCE_DIR ${LLVM_SOURCE_DIR}/projects/llvm-spirv)
-    set(SPIRV_BASE_REVISION 049776f815b12525dcd7a0869e0ee68a70d01b92)
+    set(SPIRV_BASE_REVISION 6b3920fed310f223b1a69b0273eb7c243d9f6257)
 
     apply_patches(${CLANG_SOURCE_DIR}
                   ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
@@ -143,9 +143,6 @@ set (LLVM_VER_MINOR ${LLVM_VERSION_MINOR} )
 add_definitions( -D__STDC_LIMIT_MACROS )
 add_definitions( -D__STDC_CONSTANT_MACROS )
 add_definitions( -DCOMMON_CLANG_EXPORTS )
-if (NOT WIN32)
-    add_definitions( -DLIBCOMMON_CLANG_NAME="lib${COMMON_CLANG_LIBRARY_NAME}.so")
-endif()
 
 #
 # Include directories
@@ -262,15 +259,24 @@ if (WIN32)
             "RC_PRODUCT_NAME=\"${RC_PRODUCT_NAME}\""
             "RC_PRODUCT_VERSION=\"${RC_FILE_VERSION}\""
             "RC_COPYRIGHT=\"Copyright ${RC_CHAR_C} 2018 Intel Corporation. All rights reserved.\"")
+
+    install (TARGETS ${TARGET_NAME}
+        ARCHIVE DESTINATION lib
+        COMPONENT ${TARGET_NAME}
+    )
 elseif(UNIX)
     set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
-                      LINK_FLAGS " -Wl,--no-undefined")
+        COMPILE_DEFINITIONS LIBCOMMON_CLANG_NAME="$<TARGET_SONAME_FILE_NAME:${TARGET_NAME}>")
+
+    set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
+        LINK_FLAGS " -Wl,--no-undefined")
+
+    SET_LINUX_EXPORTS_FILE( ${TARGET_NAME} common_clang.map )
 endif(WIN32)
 
 install(FILES common_clang.h
         DESTINATION include/cclang
         COMPONENT ${TARGET_NAME})
 
-SET_LINUX_EXPORTS_FILE( ${TARGET_NAME} common_clang.map )
 
 add_custom_target(deploy DEPENDS install-${TARGET_NAME})
