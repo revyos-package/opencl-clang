@@ -1,3 +1,9 @@
+intel-opencl-clang (8.0.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Thu, 01 Aug 2019 10:10:00 +0300
+
 intel-opencl-clang (8.0.0-1) experimental; urgency=medium
 
   * New upstream release.
