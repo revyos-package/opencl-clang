@@ -1,6 +1,7 @@
 intel-opencl-clang (10.0.0-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Build with llvm-10.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 02 Apr 2020 06:37:21 +0300
 
