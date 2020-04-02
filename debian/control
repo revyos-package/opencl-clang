@@ -3,7 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
 Uploaders: Timo Aaltonen <tjaalton@debian.org>
-Build-Depends: debhelper (>= 11),
+Build-Depends: debhelper-compat (= 12),
  clang-10,
  cmake,
  git,
