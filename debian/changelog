@@ -1,0 +1,45 @@
+intel-opencl-clang (9.0.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Build with llvm9.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Tue, 24 Sep 2019 15:08:42 +0300
+
+intel-opencl-clang (8.0.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * dlopen-soname.diff: Dropped, upstream.
+  * control: Bump build-dep on libllvmspirvlib-dev.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Thu, 01 Aug 2019 10:19:54 +0300
+
+intel-opencl-clang (8.0.0-1) experimental; urgency=medium
+
+  * New upstream release.
+  * control: Bump build-dep on llvm/clang.
+  * watch: Added.
+  * Follow upstream and rename binaries.
+  * dlopen-soname.diff: Make sure the soname is opened instead of linker
+    name.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Mon, 08 Apr 2019 16:14:20 +0300
+
+intel-opencl-clang (0+git20190318-1) experimental; urgency=medium
+
+  * New upstream snapshot.
+  * Build against libllvmspirvlib8.
+  * Sync with ocl-open-80 -branch.
+  * control: Add homepage.
+  * control: Limit to amd64, i386.
+  * control: Build with clang-8.
+  * Rename binaries back to libcommon-clang*.
+  * rules: Fix build against libllvmspirvlib.
+  * control: Bump build-dep on libllvmspirvlib-dev.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Wed, 20 Mar 2019 18:31:35 +0200
+
+intel-opencl-clang (0+git20190204-1) experimental; urgency=medium
+
+  * Initial release (Closes: #921426)
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Thu, 07 Feb 2019 11:23:01 +0200

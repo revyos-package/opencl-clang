@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/pkg-info.mk
+
+%:
+	dh $@ --builddir build/
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-DLLVMSPIRV_INCLUDED_IN_LLVM=OFF \
+		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
+		-DCOMMON_CLANG_LIBRARY_NAME=opencl-clang \
+		-DCMAKE_SKIP_RPATH=true
+
+override_dh_missing:
+	dh_missing --fail-missing
+
+gentarball:
+	tar --transform 's,^,$(DEB_SOURCE)-$(DEB_VERSION_UPSTREAM)/,' \
+		--exclude 'debian' --exclude-vcs \
+		-cJf ../$(DEB_SOURCE)_$(DEB_VERSION_UPSTREAM).orig.tar.xz .
