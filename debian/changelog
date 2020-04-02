@@ -3,6 +3,7 @@ intel-opencl-clang (10.0.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * Build with llvm-10.
   * control: Use debhelper-compat, bump to 12.
+  * control: Bump policy to 4.5.0.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 02 Apr 2020 06:37:21 +0300
 
