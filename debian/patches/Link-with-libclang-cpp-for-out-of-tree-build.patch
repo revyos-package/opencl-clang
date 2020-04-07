@@ -1,0 +1,105 @@
+From 9f0c2c0f5ddea1accc921aed4c94bc52c1b85637 Mon Sep 17 00:00:00 2001
+From: Alexey Sotkin <alexey.sotkin@intel.com>
+Date: Mon, 6 Apr 2020 13:54:51 +0300
+Subject: [PATCH] Link with libclang-cpp for out-of-tree build
+
+Signed-off-by: Alexey Sotkin <alexey.sotkin@intel.com>
+---
+ .travis.yml    |  8 +++++++-
+ CMakeLists.txt | 33 ++++++++++++++++++++-------------
+ 2 files changed, 27 insertions(+), 14 deletions(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index 06d9fbc..e2a7481 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -30,11 +30,17 @@ addons:
+       - llvm-10-tools
+       - llvm-10-dev
+       - libclang-10-dev
+-      - lldb-10
+ 
+ install:
+   - wget https://github.com/KhronosGroup/SPIRV-LLVM-Translator/releases/download/dev-build/SPIRV-LLVM-Translator-dev-build-linux-Release.zip -O /tmp/SPIRV-LLVM-Translator-dev-build-linux-${BUILD_TYPE}.zip
+   - unzip /tmp/SPIRV-LLVM-Translator-dev-build-linux-${BUILD_TYPE}.zip -d spirv-llvm-translator
++# This is a work-around for a "wrong" dependency between libclang-10-dev and
++# libclang-cpp10-dev packages from apt.llv.org. Normally, we should just
++# install them both, as it is done on the master(ocl-open-110) branch. But for
++# some reason (a bug?) they remove each other when being installed via apt get.
++# Basically, all we need from libclang-cpp10-dev is the symlink below. Without
++# this symlink linker can't find libclang-cpp.so.10.
++  - sudo ln -s ${TRAVIS_ROOT}/usr/lib/llvm-10/lib/libclang-cpp.so.10 ${TRAVIS_ROOT}/usr/lib/llvm-10/lib/libclang-cpp.so
+ 
+ compiler:
+   - gcc
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 23996c4..40873cf 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -119,7 +119,7 @@ if(NOT USE_PREBUILT_LLVM)
+ 
+     set(CLANG_BASE_REVISION master)
+     set(SPIRV_BASE_REVISION master)
+-    set(TARGET_BRANCH "ocl-open-90")
++    set(TARGET_BRANCH "ocl-open-100")
+ 
+     apply_patches(${CLANG_SOURCE_DIR}
+                   ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
+@@ -206,27 +206,22 @@ link_directories(
+     ${LLVM_LIBRARY_DIRS}
+ )
+ 
+-set(ADDITIONAL_LIBS ${CMAKE_DL_LIBS})
++set(OPENCL_CLANG_LINK_LIBS ${CMAKE_DL_LIBS})
+ 
+ if(NOT LLVMSPIRVLib IN_LIST LLVM_AVAILABLE_LIBS)
+   # SPIRV-LLVM-Translator is not included into LLVM as a component.
+   # So, we need to list it here explicitly as an external library
+-  list(APPEND ADDITIONAL_LIBS LLVMSPIRVLib)
++  list(APPEND OPENCL_CLANG_LINK_LIBS LLVMSPIRVLib)
+ endif()
+ 
+ add_subdirectory(cl_headers)
+ 
+ set(LLVM_REQUIRES_EH ON)
+ 
+-add_llvm_library(${TARGET_NAME} SHARED
+-  ${TARGET_INCLUDE_FILES}
+-  ${TARGET_SOURCE_FILES}
+-  $<TARGET_OBJECTS:cl_headers>
+-
+-  DEPENDS CClangCompileOptions
+-  LINK_COMPONENTS
+-    all
+-  LINK_LIBS
++if(USE_PREBUILT_LLVM OR CLANG_LINK_CLANG_DYLIB)
++  list(APPEND OPENCL_CLANG_LINK_LIBS clang-cpp)
++else()
++  list(APPEND OPENCL_CLANG_LINK_LIBS
+ # The list of clang libraries is taken from clang makefile
+ # (build/tools/clang/tools/driver/CMakeFiles/clang.dir/link.txt)
+ # All duplicate libraries are there on purpose
+@@ -258,7 +253,19 @@ add_llvm_library(${TARGET_NAME} SHARED
+     clangAST
+     clangLex
+     clangBasic
+-    ${ADDITIONAL_LIBS}
++  )
++endif()
++
++add_llvm_library(${TARGET_NAME} SHARED
++  ${TARGET_INCLUDE_FILES}
++  ${TARGET_SOURCE_FILES}
++  $<TARGET_OBJECTS:cl_headers>
++
++  DEPENDS CClangCompileOptions
++  LINK_COMPONENTS
++    all
++  LINK_LIBS
++    ${OPENCL_CLANG_LINK_LIBS}
+   )
+ 
+ # Configure resource file on Windows
+-- 
+2.25.1
+
