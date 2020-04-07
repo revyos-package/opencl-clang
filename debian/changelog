@@ -4,6 +4,9 @@ intel-opencl-clang (10.0.0-1) UNRELEASED; urgency=medium
   * Build with llvm-10.
   * control: Use debhelper-compat, bump to 12.
   * control: Bump policy to 4.5.0.
+  * Link-with-libclang-cpp-for-out-of-tree-build.patch: Add a patch to
+    fix build with llvm-10, and add libclang-cpp10-dev to build-
+    depends.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Thu, 02 Apr 2020 06:37:21 +0300
 
