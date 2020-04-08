@@ -1,3 +1,9 @@
+intel-opencl-clang (10.0.0-2) UNRELEASED; urgency=medium
+
+  * control: Build -dev on amd64/i386 like the lib. (Closes: #955815)
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Wed, 08 Apr 2020 21:09:07 +0300
+
 intel-opencl-clang (10.0.0-1) unstable; urgency=medium
 
   * New upstream release.

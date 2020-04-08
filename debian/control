@@ -26,7 +26,7 @@ Description: thin wrapper for clang
  to SPIR-V modules.
 
 Package: libopencl-clang-dev
-Architecture: all
+Architecture: amd64 i386
 Depends: ${misc:Depends},
  libopencl-clang10 (>= ${source:Version}),
  libopencl-clang10 (<< ${source:Upstream-Version}+1~)
