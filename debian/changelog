@@ -1,6 +1,7 @@
 intel-opencl-clang (11.0~git20200922-1) UNRELEASED; urgency=medium
 
   * New upstream snapshot.
+  * Build with llvm-11.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Tue, 22 Sep 2020 20:19:52 +0300
 
