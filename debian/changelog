@@ -1,11 +1,11 @@
-intel-opencl-clang (11.0~git20200922-1) UNRELEASED; urgency=medium
+intel-opencl-clang (11.0~git20200922-1) unstable; urgency=medium
 
   * New upstream snapshot.
   * Build with llvm-11.
   * Link-with-libclang-cpp-for-out-of-tree-build.patch: Dropped,
     upstream.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Tue, 22 Sep 2020 20:19:52 +0300
+ -- Timo Aaltonen <tjaalton@debian.org>  Tue, 22 Sep 2020 20:42:53 +0300
 
 intel-opencl-clang (10.0.0-2) unstable; urgency=medium
 
