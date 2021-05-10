@@ -4,20 +4,20 @@ Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
 Uploaders: Timo Aaltonen <tjaalton@debian.org>
 Build-Depends: debhelper-compat (= 12),
- clang-11,
+ clang-12,
  cmake,
  git,
- libclang-11-dev,
- libclang-cpp11-dev,
- libllvmspirvlib-dev (>= 11.0~),
- lldb-11,
- llvm-11-dev,
+ libclang-12-dev,
+ libclang-cpp12-dev,
+ libllvmspirvlib-dev (>= 12.0~),
+ lldb-12,
+ llvm-12-dev,
 Standards-Version: 4.5.0
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
 Vcs-Git: https://salsa.debian.org/opencl-team/intel-opencl-clang.git
 
-Package: libopencl-clang11
+Package: libopencl-clang12
 Architecture: amd64 i386
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: thin wrapper for clang
@@ -28,8 +28,8 @@ Description: thin wrapper for clang
 Package: libopencl-clang-dev
 Architecture: amd64 i386
 Depends: ${misc:Depends},
- libopencl-clang11 (>= ${source:Version}),
- libopencl-clang11 (<< ${source:Upstream-Version}+1~)
+ libopencl-clang12 (>= ${source:Version}),
+ libopencl-clang12 (<< ${source:Upstream-Version}+1~)
 Description: thin wrapper for clang -- development files
  Opencl-clang is a thin wrapper library around clang. It has an
  OpenCL-oriented API and is capable of compiling OpenCL C kernels
