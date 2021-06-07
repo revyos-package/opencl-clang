@@ -1,8 +1,8 @@
-intel-opencl-clang (12.0.0-1) UNRELEASED; urgency=medium
+intel-opencl-clang (12.0.0-1) experimental; urgency=medium
 
   * New upstream release.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Mon, 07 Jun 2021 12:27:09 +0300
+ -- Timo Aaltonen <tjaalton@debian.org>  Mon, 07 Jun 2021 12:32:32 +0300
 
 intel-opencl-clang (12.0~git20210510-1) experimental; urgency=medium
 
