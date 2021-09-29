@@ -1,3 +1,9 @@
+intel-opencl-clang (12.0.0-3) UNRELEASED; urgency=medium
+
+  * rules: Set llvm version.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
+
 intel-opencl-clang (12.0.0-2) unstable; urgency=medium
 
   * Upload to unstable.
