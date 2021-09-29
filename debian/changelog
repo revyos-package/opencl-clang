@@ -1,6 +1,7 @@
 intel-opencl-clang (12.0.0-3) UNRELEASED; urgency=medium
 
   * rules: Set llvm version.
+  * control: Drop git from build-depends, not used anymore.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 

@@ -6,7 +6,6 @@ Uploaders: Timo Aaltonen <tjaalton@debian.org>
 Build-Depends: debhelper-compat (= 12),
  clang-12,
  cmake,
- git,
  libclang-12-dev,
  libclang-cpp12-dev,
  libllvmspirvlib-dev (>= 12.0~),
