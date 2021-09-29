@@ -3,6 +3,7 @@ intel-opencl-clang (13.0~git20210929-1) UNRELEASED; urgency=medium
   * New upstream snapshot.
   * Build with llvm 13.
   * rules: Set llvm version.
+  * control: Drop git from build-depends, not used anymore.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
