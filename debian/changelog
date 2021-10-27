@@ -1,6 +1,7 @@
 intel-opencl-clang (13.0.0-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * control: Bump debhelper to 13.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Tue, 19 Oct 2021 15:02:21 +0300
 
