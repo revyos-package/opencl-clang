@@ -1,9 +1,13 @@
 intel-opencl-clang (12.0.0-3) UNRELEASED; urgency=medium
 
+  [ Timo Aaltonen ]
   * rules: Set llvm version.
   * control: Drop git from build-depends, not used anymore.
   * control: Bump debhelper to 13.
   * control: Bump policy to 4.6.0.
+
+  [ Andreas Beckmann ]
+  * rules: Parse llvm version from Build-Depends.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
