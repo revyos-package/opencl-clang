@@ -2,6 +2,9 @@
 
 include /usr/share/dpkg/pkg-info.mk
 
+LLVM_VERSION		 = $(shell sed -n -r '/^Build/,/^$$/s/.*llvm-([0-9]+)-dev.*/\1/p' debian/control)
+LLVM_UPSTREAM_VERSION	 = $(shell dpkg-query -f '$${source:Upstream-Version}\n' -W llvm-$(LLVM_VERSION)-dev)
+
 %:
 	dh $@ --builddir build/
 
@@ -11,7 +14,7 @@ override_dh_auto_configure:
 		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
 		-DCOMMON_CLANG_LIBRARY_NAME=opencl-clang \
 		-DCMAKE_SKIP_RPATH=true \
-		-DPREFERRED_LLVM_VERSION=11.0.0
+		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION)
 
 override_dh_missing:
 	dh_missing --fail-missing
