@@ -8,6 +8,7 @@ intel-opencl-clang (11.0.0-2) UNRELEASED; urgency=medium
 
   [ Andreas Beckmann ]
   * rules: Parse llvm version from Build-Depends.
+  * control: Build-depend on libllvmspirvlib-11-dev.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
