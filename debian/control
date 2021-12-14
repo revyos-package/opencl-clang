@@ -8,7 +8,7 @@ Build-Depends: debhelper-compat (= 13),
  cmake,
  libclang-12-dev,
  libclang-cpp12-dev,
- libllvmspirvlib-dev (>= 12.0~),
+ libllvmspirvlib-12-dev,
  lldb-12,
  llvm-12-dev,
 Standards-Version: 4.6.0
