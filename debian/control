@@ -9,7 +9,6 @@ Build-Depends: debhelper-compat (= 13),
  libclang-11-dev,
  libclang-cpp11-dev,
  libllvmspirvlib-11-dev,
- lldb-11,
  llvm-11-dev,
 Standards-Version: 4.6.0
 Homepage: https://github.com/intel/opencl-clang
