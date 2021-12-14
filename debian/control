@@ -10,6 +10,7 @@ Build-Depends: debhelper-compat (= 13),
  libclang-cpp12-dev,
  libllvmspirvlib-12-dev,
  llvm-12-dev,
+Rules-Requires-Root: no
 Standards-Version: 4.6.0
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
