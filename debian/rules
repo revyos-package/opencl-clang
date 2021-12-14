@@ -16,8 +16,6 @@ override_dh_auto_configure:
 		-DCMAKE_SKIP_RPATH=true \
 		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION)
 
-override_dh_missing:
-	dh_missing --fail-missing
 
 gentarball:
 	tar --transform 's,^,$(DEB_SOURCE)-$(DEB_VERSION_UPSTREAM)/,' \
