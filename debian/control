@@ -29,6 +29,8 @@ Architecture: amd64 i386
 Depends: ${misc:Depends},
  libopencl-clang12 (>= ${source:Version}),
  libopencl-clang12 (<< ${source:Upstream-Version}+1~)
+Provides:
+ libopencl-clang-12-dev,
 Description: thin wrapper for clang -- development files
  Opencl-clang is a thin wrapper library around clang. It has an
  OpenCL-oriented API and is capable of compiling OpenCL C kernels
