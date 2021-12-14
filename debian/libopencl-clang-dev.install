@@ -1,2 +1,2 @@
-usr/lib/libopencl-clang.so
 usr/include
+usr/lib/libopencl-clang.so	usr/lib/${DEB_HOST_MULTIARCH}/
