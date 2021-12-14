@@ -10,6 +10,7 @@ intel-opencl-clang (12.0.0-3) UNRELEASED; urgency=medium
   * rules: Parse llvm version from Build-Depends.
   * control: Build-depend on libllvmspirvlib-12-dev.
   * control: Provide virtual package libopencl-clang-12-dev.
+  * control: Drop Build-Depends: lldb-12, apparently unused.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
