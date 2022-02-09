@@ -9,7 +9,6 @@ opencl-clang-12 (12.0.0-3) UNRELEASED; urgency=medium
   [ Andreas Beckmann ]
   * rules: Parse llvm version from Build-Depends.
   * control: Build-depend on libllvmspirvlib-12-dev.
-  * control: Provide virtual package libopencl-clang-12-dev.
   * control: Drop Build-Depends: lldb-12, apparently unused.
   * control: Set Architecture: any.
   * control: Set Rules-Requires-Root: no.
@@ -18,6 +17,7 @@ opencl-clang-12 (12.0.0-3) UNRELEASED; urgency=medium
   * Add myself to Uploaders.
   * Have one set of packages per llvm version:
     - Fork source package as opencl-clang-12.
+    - Rename binary package: libopencl-clang-dev => libopencl-clang-12-dev.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
