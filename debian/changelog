@@ -1,4 +1,4 @@
-opencl-clang-12 (12.0.0-3) UNRELEASED; urgency=medium
+opencl-clang-12 (12.0.0-3) unstable; urgency=medium
 
   [ Timo Aaltonen ]
   * rules: Set llvm version.
@@ -19,7 +19,7 @@ opencl-clang-12 (12.0.0-3) UNRELEASED; urgency=medium
     - Fork source package as opencl-clang-12.
     - Rename binary package: libopencl-clang-dev => libopencl-clang-12-dev.
 
- -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 09 Feb 2022 20:12:59 +0100
 
 intel-opencl-clang (12.0.0-2) unstable; urgency=medium
 
