@@ -1,4 +1,4 @@
-Source: intel-opencl-clang
+Source: opencl-clang-12
 Section: libdevel
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
@@ -16,7 +16,7 @@ Rules-Requires-Root: no
 Standards-Version: 4.6.0
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/intel-opencl-clang.git
+Vcs-Git: https://salsa.debian.org/opencl-team/intel-opencl-clang.git -b llvm12/master
 
 Package: libopencl-clang12
 Architecture: any
