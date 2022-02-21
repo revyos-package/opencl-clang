@@ -33,8 +33,13 @@ Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends},
  libopencl-clang13 (= ${binary:Version}),
+Conflicts:
+ libopencl-clang-x.y-dev,
+Replaces:
+ libopencl-clang-x.y-dev,
 Provides:
  libopencl-clang-13-dev,
+ libopencl-clang-x.y-dev,
 Description: thin wrapper for clang -- development files
  Opencl-clang is a thin wrapper library around clang. It has an
  OpenCL-oriented API and is capable of compiling OpenCL C kernels
