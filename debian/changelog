@@ -19,6 +19,7 @@ opencl-clang-11 (11.0.0-2) UNRELEASED; urgency=medium
     - Fork source package as opencl-clang-11.
     - Rename binary package: libopencl-clang-dev => libopencl-clang-11-dev.
   * Enable all hardening flags.
+  * Restrict watch file to 11.* releases.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 14:48:29 +0300
 
