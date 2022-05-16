@@ -1,3 +1,11 @@
+opencl-clang-12 (12.0.0-4) UNRELEASED; urgency=medium
+
+  * Restrict watch file to 12.* releases.
+  * Enable all hardening flags.
+  * Bump Standards-Version to 4.6.1.
+
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 16 May 2022 13:50:38 +0200
+
 opencl-clang-12 (12.0.0-3) unstable; urgency=medium
 
   [ Timo Aaltonen ]
@@ -39,6 +47,31 @@ intel-opencl-clang (12.0~git20210510-1) experimental; urgency=medium
     - build with llvm-12
 
  -- Timo Aaltonen <tjaalton@debian.org>  Mon, 10 May 2021 17:58:01 +0300
+
+opencl-clang-11 (11.0.0-2) unstable; urgency=medium
+
+  [ Timo Aaltonen ]
+  * rules: Set llvm version.
+  * control: Drop git from build-depends, not used anymore.
+  * control: Bump debhelper to 13.
+  * control: Bump policy to 4.6.0.
+
+  [ Andreas Beckmann ]
+  * rules: Parse llvm version from Build-Depends.
+  * control: Build-depend on libllvmspirvlib-11-dev.
+  * control: Drop Build-Depends: lldb-11, apparently unused.
+  * control: Set Architecture: any.
+  * control: Set Rules-Requires-Root: no.
+  * control, install: Multiarchify the packages.
+  * upstream/metadata: Add.
+  * Add myself to Uploaders.
+  * Have one set of packages per llvm version:
+    - Fork source package as opencl-clang-11.
+    - Rename binary package: libopencl-clang-dev => libopencl-clang-11-dev.
+  * Enable all hardening flags.
+  * Restrict watch file to 11.* releases.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 13 Apr 2022 14:55:06 +0200
 
 intel-opencl-clang (11.0.0-1) unstable; urgency=medium
 

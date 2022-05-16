@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+export DEB_BUILD_MAINT_OPTIONS	 = hardening=+all
+
 include /usr/share/dpkg/pkg-info.mk
 
 LLVM_VERSION		 = $(shell sed -n -r '/^Build/,/^$$/s/.*llvm-([0-9]+)-dev.*/\1/p' debian/control)
@@ -14,10 +16,12 @@ override_dh_auto_configure:
 		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
 		-DCOMMON_CLANG_LIBRARY_NAME=opencl-clang \
 		-DCMAKE_SKIP_RPATH=true \
-		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION)
+		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION) \
+		-Wno-dev
 
 
-gentarball:
-	tar --transform 's,^,$(DEB_SOURCE)-$(DEB_VERSION_UPSTREAM)/,' \
-		--exclude 'debian' --exclude-vcs \
-		-cJf ../$(DEB_SOURCE)_$(DEB_VERSION_UPSTREAM).orig.tar.xz .
+ifneq (,$(wildcard .git))
+upstream:
+	git remote show $@ >/dev/null 2>&1 || git remote add $@ $(shell sed -rn 's/Repository: //p' debian/upstream/metadata)
+	git fetch $@ --prune
+endif
