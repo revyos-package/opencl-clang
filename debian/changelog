@@ -1,10 +1,10 @@
-intel-opencl-clang (13.0.0-4) UNRELEASED; urgency=medium
+intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
   * Restrict watch file to 13.* releases.
   * Enable all hardening flags.
   * Bump Standards-Version to 4.6.1.
 
- -- Andreas Beckmann <anbe@debian.org>  Mon, 16 May 2022 22:32:14 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 16 May 2022 22:41:01 +0200
 
 intel-opencl-clang (13.0.0-3) unstable; urgency=medium
 
