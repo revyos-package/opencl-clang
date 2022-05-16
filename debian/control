@@ -1,4 +1,4 @@
-Source: intel-opencl-clang
+Source: opencl-clang-13
 Section: libdevel
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
@@ -13,10 +13,10 @@ Build-Depends: debhelper-compat (= 13),
  libllvmspirvlib-13-dev,
  llvm-13-dev,
 Rules-Requires-Root: no
-Standards-Version: 4.6.0
+Standards-Version: 4.6.1
 Homepage: https://github.com/intel/opencl-clang
-Vcs-Browser: https://salsa.debian.org/opencl-team/intel-opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/intel-opencl-clang.git
+Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
+Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm13/master
 
 Package: libopencl-clang13
 Architecture: any
@@ -28,17 +28,19 @@ Description: thin wrapper for clang
  OpenCL-oriented API and is capable of compiling OpenCL C kernels
  to SPIR-V modules.
 
-Package: libopencl-clang-dev
+Package: libopencl-clang-13-dev
 Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends},
  libopencl-clang13 (= ${binary:Version}),
 Conflicts:
  libopencl-clang-x.y-dev,
+Breaks:
+ libopencl-clang-dev (<< 13.0.0-2~),
 Replaces:
  libopencl-clang-x.y-dev,
+ libopencl-clang-dev (<< 13.0.0-2~),
 Provides:
- libopencl-clang-13-dev,
  libopencl-clang-x.y-dev,
 Description: thin wrapper for clang -- development files
  Opencl-clang is a thin wrapper library around clang. It has an
