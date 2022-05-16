@@ -1,4 +1,4 @@
-opencl-clang-13 (13.0.0-4) UNRELEASED; urgency=medium
+intel-opencl-clang (13.0.0-4) UNRELEASED; urgency=medium
 
   * Restrict watch file to 13.* releases.
   * Enable all hardening flags.
