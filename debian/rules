@@ -19,7 +19,3 @@ override_dh_auto_configure:
 		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION)
 
 
-gentarball:
-	tar --transform 's,^,$(DEB_SOURCE)-$(DEB_VERSION_UPSTREAM)/,' \
-		--exclude 'debian' --exclude-vcs \
-		-cJf ../$(DEB_SOURCE)_$(DEB_VERSION_UPSTREAM).orig.tar.xz .
