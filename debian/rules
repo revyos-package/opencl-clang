@@ -20,3 +20,8 @@ override_dh_auto_configure:
 		-Wno-dev
 
 
+ifneq (,$(wildcard .git))
+upstream:
+	git remote show $@ >/dev/null 2>&1 || git remote add $@ $(shell sed -rn 's/Repository: //p' debian/upstream/metadata)
+	git fetch $@ --prune
+endif
