@@ -1,11 +1,11 @@
-opencl-clang-14 (14.0.0-1) UNRELEASED; urgency=medium
+opencl-clang-14 (14.0.0-1) unstable; urgency=medium
 
   * New upstream release.
   * Fork source package as opencl-clang-14.
   * Rename binary packages: *13* => *14*.
   * Build with llvm 14.
 
- -- Andreas Beckmann <anbe@debian.org>  Tue, 17 May 2022 10:09:19 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 17 May 2022 10:18:27 +0200
 
 intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
