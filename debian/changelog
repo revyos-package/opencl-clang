@@ -1,10 +1,16 @@
-opencl-clang-13 (13.0.0-4) UNRELEASED; urgency=medium
+opencl-clang-14 (13.0.0-5) UNRELEASED; urgency=medium
+
+  * Fork source package as opencl-clang-14.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 17 May 2022 10:03:22 +0200
+
+intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
   * Restrict watch file to 13.* releases.
   * Enable all hardening flags.
   * Bump Standards-Version to 4.6.1.
 
- -- Andreas Beckmann <anbe@debian.org>  Mon, 16 May 2022 22:32:14 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 16 May 2022 22:41:01 +0200
 
 intel-opencl-clang (13.0.0-3) unstable; urgency=medium
 
