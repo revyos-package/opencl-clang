@@ -14,13 +14,18 @@ set(CMAKE_MODULE_PATH
 
 include(CMakeFunctions)
 
+if(LLVM_USE_HOST_TOOLS)
+  include(CrossCompile)
+  llvm_create_cross_target(${PROJECT_NAME} NATIVE "" Release)
+endif()
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(USE_PREBUILT_LLVM ON)
 
     add_definitions(-DUSE_PREBUILT_LLVM)
 
     if(NOT PREFERRED_LLVM_VERSION)
-        set(PREFERRED_LLVM_VERSION "14.0.0")
+        set(PREFERRED_LLVM_VERSION "15.0.0")
     endif(NOT PREFERRED_LLVM_VERSION)
     message(STATUS "[OPENCL-CLANG] Looking for LLVM version ${PREFERRED_LLVM_VERSION}")
     find_package(LLVM ${PREFERRED_LLVM_VERSION} REQUIRED)
@@ -55,7 +60,7 @@ include(AddLLVM)
 include(TableGen)
 
 if (NOT WIN32)
-    add_subdirectory( linux_linker )
+    add_subdirectory( linux_linker bin )
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -80,13 +85,13 @@ set(TARGET_NAME ${COMMON_CLANG_LIBRARY_NAME}${BUILD_PLATFORM} )
 if(NOT USE_PREBUILT_LLVM)
 
     if(NOT LLVM_EXTERNAL_CLANG_SOURCE_DIR)
-        set(LLVM_BASE_REVISION release_14)
+        set(LLVM_BASE_REVISION release_15)
         set(CLANG_SOURCE_DIR ${LLVM_SOURCE_DIR}/tools/clang)
-        set(CLANG_BASE_REVISION release_14)
+        set(CLANG_BASE_REVISION release_15)
     elseif(EXISTS "${LLVM_EXTERNAL_CLANG_SOURCE_DIR}/CMakeLists.txt")
-	    set(LLVM_BASE_REVISION release/14.x)
+	    set(LLVM_BASE_REVISION release/15.x)
         set(CLANG_SOURCE_DIR "${LLVM_EXTERNAL_CLANG_SOURCE_DIR}")
-        set(CLANG_BASE_REVISION release/14.x)
+        set(CLANG_BASE_REVISION release/15.x)
     endif()
     if(EXISTS ${CLANG_SOURCE_DIR})
         message(STATUS "[OPENCL-CLANG] Using Clang source code direcotry: ${CLANG_SOURCE_DIR}")
@@ -121,8 +126,8 @@ if(NOT USE_PREBUILT_LLVM)
         )
     endif()
     
-    set(SPIRV_BASE_REVISION llvm_release_140)
-    set(TARGET_BRANCH "ocl-open-140")
+    set(SPIRV_BASE_REVISION llvm_release_150)
+    set(TARGET_BRANCH "ocl-open-150")
     get_filename_component(LLVM_MONOREPO_DIR ${LLVM_SOURCE_DIR} DIRECTORY)
     set(LLVM_PATCHES_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/patches/llvm
                           ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang)
@@ -143,8 +148,7 @@ endif(NOT USE_PREBUILT_LLVM)
 #
 set (COMPILE_OPTIONS_TD  opencl_clang_options.td)
 set (COMPILE_OPTIONS_INC opencl_clang_options.inc)
-
-set(LLVM_TABLEGEN_EXE "llvm-tblgen")
+find_program(LLVM_TABLEGEN_EXE "llvm-tblgen" ${LLVM_TOOLS_BINARY_DIR})
 set(LLVM_TARGET_DEFINITIONS ${COMPILE_OPTIONS_TD})
 if(USE_PREBUILT_LLVM)
   set(TABLEGEN_ADDITIONAL -I ${LLVM_INCLUDE_DIRS})
