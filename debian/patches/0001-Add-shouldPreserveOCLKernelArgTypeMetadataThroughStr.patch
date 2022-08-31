@@ -1,0 +1,34 @@
+From 9bd6fe456b16182b4515aaa69f5ed8dca04c6ccf Mon Sep 17 00:00:00 2001
+From: mnaczk <marcin.naczk@intel.com>
+Date: Tue, 24 May 2022 09:19:30 +0200
+Subject: [PATCH] Add shouldPreserveOCLKernelArgTypeMetadataThroughString
+ (#354)
+
+* Add shouldPreserveOCLKernelArgTypeMetadataThroughString
+
+Because of commit:
+https://github.com/KhronosGroup/SPIRV-LLVM-Translator/commit/835eb7e8696ab4ba764d6e1b4c2f3e2c4ddc0551
+Need to add shouldPreserveOCLKernelArgTypeMetadataThroughString
+to SPIRV::TranslatorOpts to still be able to correctly parse
+kernel arguments type, by metadata.
+
+* fix function name
+---
+ common_clang.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/common_clang.cpp b/common_clang.cpp
+index cfae18b..4d4432a 100644
+--- a/common_clang.cpp
++++ b/common_clang.cpp
+@@ -324,6 +324,7 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
+       if (!optionsParser.hasOptDisable()) {
+         SPIRVOpts.setMemToRegEnabled(true);
+       }
++      SPIRVOpts.setPreserveOCLKernelArgTypeMetadataThroughString(true);
+       success = llvm::writeSpirv(M.get(), SPIRVOpts, OS, Err);
+       err_ostream << Err.c_str();
+       err_ostream.flush();
+-- 
+2.20.1
+
