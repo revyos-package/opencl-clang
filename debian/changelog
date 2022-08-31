@@ -1,9 +1,9 @@
-opencl-clang-14 (14.0.0-2) UNRELEASED; urgency=medium
+opencl-clang-14 (14.0.0-2) unstable; urgency=medium
 
   * Cherry-pick commit 9bd6fe4 from upstream to fix intel-compute-runtime
     test failure.
 
- -- Andreas Beckmann <anbe@debian.org>  Wed, 31 Aug 2022 07:48:56 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 31 Aug 2022 08:58:18 +0200
 
 opencl-clang-14 (14.0.0-1) unstable; urgency=medium
 
