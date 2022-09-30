@@ -1,3 +1,9 @@
+intel-opencl-clang (13.0.0-5) UNRELEASED; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 30 Sep 2022 19:10:29 +0200
+
 intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
   * Restrict watch file to 13.* releases.
@@ -42,6 +48,12 @@ intel-opencl-clang (13.0~git20210929-1) unstable; urgency=medium
   * control: Drop git from build-depends, not used anymore.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 15:09:59 +0300
+
+opencl-clang-12 (12.0.0-5) unstable; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 30 Sep 2022 19:05:29 +0200
 
 opencl-clang-12 (12.0.0-4) unstable; urgency=medium
 
@@ -92,6 +104,12 @@ intel-opencl-clang (12.0~git20210510-1) experimental; urgency=medium
     - build with llvm-12
 
  -- Timo Aaltonen <tjaalton@debian.org>  Mon, 10 May 2021 17:58:01 +0300
+
+opencl-clang-11 (11.0.0-3) unstable; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 29 Sep 2022 17:55:45 +0200
 
 opencl-clang-11 (11.0.0-2) unstable; urgency=medium
 
