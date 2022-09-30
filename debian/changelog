@@ -1,8 +1,8 @@
-opencl-clang-12 (12.0.0-5) UNRELEASED; urgency=medium
+opencl-clang-12 (12.0.0-5) unstable; urgency=medium
 
   * Add .symbols control file.
 
- -- Andreas Beckmann <anbe@debian.org>  Thu, 29 Sep 2022 18:02:54 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 30 Sep 2022 19:05:29 +0200
 
 opencl-clang-12 (12.0.0-4) unstable; urgency=medium
 
