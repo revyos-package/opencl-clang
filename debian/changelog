@@ -1,8 +1,8 @@
-intel-opencl-clang (13.0.0-5) UNRELEASED; urgency=medium
+intel-opencl-clang (13.0.0-5) unstable; urgency=medium
 
   * Add .symbols control file.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 30 Sep 2022 19:10:29 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 02 Oct 2022 13:52:40 +0200
 
 intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
