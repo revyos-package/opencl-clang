@@ -1,3 +1,9 @@
+opencl-clang-14 (14.0.0-3) UNRELEASED; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 02 Oct 2022 13:59:56 +0200
+
 opencl-clang-14 (14.0.0-2) unstable; urgency=medium
 
   * Cherry-pick commit 9bd6fe4 from upstream to fix intel-compute-runtime
@@ -13,6 +19,12 @@ opencl-clang-14 (14.0.0-1) unstable; urgency=medium
   * Build with llvm 14.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 17 May 2022 10:18:27 +0200
+
+intel-opencl-clang (13.0.0-5) unstable; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 02 Oct 2022 13:52:40 +0200
 
 intel-opencl-clang (13.0.0-4) unstable; urgency=medium
 
@@ -58,6 +70,12 @@ intel-opencl-clang (13.0~git20210929-1) unstable; urgency=medium
   * control: Drop git from build-depends, not used anymore.
 
  -- Timo Aaltonen <tjaalton@debian.org>  Wed, 29 Sep 2021 15:09:59 +0300
+
+opencl-clang-12 (12.0.0-5) unstable; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 30 Sep 2022 19:05:29 +0200
 
 opencl-clang-12 (12.0.0-4) unstable; urgency=medium
 
@@ -108,6 +126,12 @@ intel-opencl-clang (12.0~git20210510-1) experimental; urgency=medium
     - build with llvm-12
 
  -- Timo Aaltonen <tjaalton@debian.org>  Mon, 10 May 2021 17:58:01 +0300
+
+opencl-clang-11 (11.0.0-3) unstable; urgency=medium
+
+  * Add .symbols control file.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 29 Sep 2022 17:55:45 +0200
 
 opencl-clang-11 (11.0.0-2) unstable; urgency=medium
 
