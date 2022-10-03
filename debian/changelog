@@ -1,6 +1,6 @@
-opencl-clang-14 (14.0.0-4) UNRELEASED; urgency=medium
+opencl-clang-15 (14.0.0-4) UNRELEASED; urgency=medium
 
-  * Restrict watch file to 14.* releases.
+  * Fork source package as opencl-clang-15.
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 03 Oct 2022 23:23:55 +0200
 
