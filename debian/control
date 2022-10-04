@@ -18,7 +18,7 @@ Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
 Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm15/master
 
-Package: libopencl-clang14
+Package: libopencl-clang15
 Architecture: any
 Multi-Arch: same
 Section: libs
@@ -28,11 +28,11 @@ Description: thin wrapper for clang
  OpenCL-oriented API and is capable of compiling OpenCL C kernels
  to SPIR-V modules.
 
-Package: libopencl-clang-14-dev
+Package: libopencl-clang-15-dev
 Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends},
- libopencl-clang14 (= ${binary:Version}),
+ libopencl-clang15 (= ${binary:Version}),
 Conflicts:
  libopencl-clang-x.y-dev,
 Breaks:
