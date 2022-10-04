@@ -3,6 +3,7 @@ opencl-clang-15 (15.0.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * Fork source package as opencl-clang-15.
   * Rename binary packages: *14* => *15*.
+  * Build with llvm 15.
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 03 Oct 2022 23:33:16 +0200
 
