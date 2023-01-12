@@ -14,10 +14,10 @@ Build-Depends: debhelper-compat (= 13),
  libllvmspirvlib-15-dev,
  llvm-15-dev,
 Rules-Requires-Root: no
-Standards-Version: 4.6.1
+Standards-Version: 4.6.2
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm15/master
+Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm15/main
 
 Package: libopencl-clang15
 Architecture: any
