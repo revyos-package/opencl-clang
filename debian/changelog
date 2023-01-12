@@ -1,8 +1,8 @@
-opencl-clang-15 (15.0.0-2) UNRELEASED; urgency=medium
+opencl-clang-15 (15.0.0-2) unstable; urgency=medium
 
   * Bump Standards-Version to 4.6.2.
 
- -- Andreas Beckmann <anbe@debian.org>  Thu, 12 Jan 2023 01:03:27 +0100
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 12 Jan 2023 01:06:39 +0100
 
 opencl-clang-15 (15.0.0-1) unstable; urgency=medium
 
