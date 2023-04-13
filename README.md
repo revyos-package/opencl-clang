@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/intel/opencl-clang.svg?branch=master)](https://travis-ci.com/intel/opencl-clang)
+
 opencl-clang is a thin wrapper library around clang. The library has
 OpenCL-oriented API and is capable to compile OpenCL C kernels to SPIR-V
 modules.
@@ -23,9 +25,9 @@ Before the build all dependencies must be downloaded and laid out as follows:
 This can be done using the following commands:
 ```bash
 cd <workspace>
-git clone https://github.com/llvm/llvm-project.git . -b release/15.x
-git clone https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git -b llvm_release_150
-git clone https://github.com/intel/opencl-clang.git -b ocl-open-150
+git clone https://github.com/llvm/llvm-project.git . -b release/16.x
+git clone https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git -b llvm_release_160
+git clone https://github.com/intel/opencl-clang.git -b ocl-open-160
 ```
 
 Then we need to create a build directory and run the build:
@@ -37,7 +39,7 @@ cmake -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_ENABLE_PROJECTS="clang" \
       -DLLVM_EXTERNAL_PROJECTS="llvm-spirv;opencl-clang" \
       -DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR="$OCL_CLANG_WS/SPIRV-LLVM-Translator" \
       -DLLVM_EXTERNAL_OPENCL_CLANG_SOURCE_DIR="$OCL_CLANG_WS/opencl-clang" \
-      $OCL_CLANG_WS/llvm
+      -DCMAKE_BUILD_TYPE=Release $OCL_CLANG_WS/llvm
 make opencl-clang -j`nproc`
 ```
 
@@ -50,13 +52,15 @@ To build opencl-clang as a standalone project, you need to obtain pre-built LLVM
 and SPIR-V Translator libraries. **Note:** currently this kind of build is
 supported on Linux only.
 
+If opencl-clang is used as part of another CMake project, you will need to define `OPENCL_CLANG_BUILD_EXTERNAL`.
+
 Integration with pre-built LLVM is done using standard `find_package` way as
 documented in [Embedding LLVM in your project](https://llvm.org/docs/CMake.html#embedding-llvm-in-your-project).
 
 Commands to checkout sources and build:
 ```bash
 cd <workspace>
-git clone https://github.com/intel/opencl-clang.git -b ocl-open-150
+git clone https://github.com/intel/opencl-clang.git -b ocl-open-160
 mkdir build && cd build
 cmake ../opencl-clang
 make all -j`nproc`
@@ -66,13 +70,13 @@ make all -j`nproc`
 
 ##### Preferred LLVM version
 
-By default, opencl-clang's cmake script is searching for LLVM 15.0.0. You can
+By default, openclc-clang's cmake script is searching for LLVM 16.0.0. You can
 override target version of LLVM by using the `PREFERRED_LLVM_VERSION` cmake
 option:
 
 Example:
 ```bash
-cmake -DPREFERRED_LLVM_VERSION="10.0.0" ../opencl-clang
+cmake -DPREFERRED_LLVM_VERSION="16.0.0" ../opencl-clang
 ```
 
 ##### Custom LLVM installation

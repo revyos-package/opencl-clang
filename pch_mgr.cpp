@@ -18,8 +18,8 @@ Copyright (c) Intel Corporation (2009-2017).
 
 #include "pch_mgr.h"
 
-#include "llvm/Object/ELF.h"
 #include "llvm/ADT/Twine.h"
+#include "llvm/Object/ELF.h"
 
 #include <cstdlib>
 #include <stdio.h>
@@ -35,6 +35,8 @@ struct auto_dlclose {
   auto_dlclose(void *module) : m_pModule(module) {}
 
   ~auto_dlclose() {
+    if (m_pModule)
+      dlclose(m_pModule);
   }
 
   void *get() { return m_pModule; }
@@ -208,7 +210,7 @@ bool ResourceManager::load_resource(const char *id, const char *pszType,
 #ifdef WIN32
   bool ok = GetResourceWin32(id, pszType, res, size);
 #else
-  bool ok = GetResourceUnix(id, pszType, LIBCOMMON_CLANG_NAME,
+  bool ok = GetResourceUnix(id, pszType, LIBOPENCL_CLANG_NAME,
                             false, res, size);
 #endif
 

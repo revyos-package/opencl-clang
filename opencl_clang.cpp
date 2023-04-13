@@ -12,11 +12,11 @@ Copyright (c) Intel Corporation (2009-2017).
     use of the code. No license, express or implied, by estoppel or otherwise,
     to any intellectual property rights is granted herein.
 
-  \file common_clang.cpp
+  \file opencl_clang.cpp
 
 \*****************************************************************************/
 
-#include "common_clang.h"
+#include "opencl_clang.h"
 #include "pch_mgr.h"
 #include "cl_headers/resource.h"
 #include "binary_result.h"
@@ -40,7 +40,6 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Mutex.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -63,11 +62,8 @@ Copyright (c) Intel Corporation (2009-2017).
 #define CL_OUT_OF_HOST_MEMORY -6
 
 #include "assert.h"
-#include <algorithm>
 #include <iosfwd>
 #include <iterator>
-#include <list>
-#include <streambuf>
 #ifdef _WIN32
 #include <ctype.h>
 #endif
@@ -113,20 +109,33 @@ void CommonClangInitialize() {
 }
 
 static bool GetHeaders(std::vector<Resource> &Result) {
-  struct {const char *ID; const char *Name;} Headers[] = {
-    {OPENCL_C_H,             "opencl-c.h"},
-    {OPENCL_C_BASE_H,        "opencl-c-base.h"},
-  };
+  struct {
+    const char *ID;
+    const char *Name;
+  } Headers[] = {{OPENCL_C_H, "opencl-c.h"},
+                 {OPENCL_C_BASE_H, "opencl-c-base.h"},
+                 {OPENCL_C_12_SPIR_PCM, "opencl-c-12-spir.pcm"},
+                 {OPENCL_C_20_SPIR_PCM, "opencl-c-20-spir.pcm"},
+                 {OPENCL_C_30_SPIR_PCM, "opencl-c-30-spir.pcm"},
+                 {OPENCL_C_12_SPIR64_PCM, "opencl-c-12-spir64.pcm"},
+                 {OPENCL_C_20_SPIR64_PCM, "opencl-c-20-spir64.pcm"},
+                 {OPENCL_C_30_SPIR64_PCM, "opencl-c-30-spir64.pcm"},
+                 {OPENCL_C_12_SPIR_FP64_PCM, "opencl-c-12-spir-fp64.pcm"},
+                 {OPENCL_C_20_SPIR_FP64_PCM, "opencl-c-20-spir-fp64.pcm"},
+                 {OPENCL_C_30_SPIR_FP64_PCM, "opencl-c-30-spir-fp64.pcm"},
+                 {OPENCL_C_12_SPIR64_FP64_PCM, "opencl-c-12-spir64-fp64.pcm"},
+                 {OPENCL_C_20_SPIR64_FP64_PCM, "opencl-c-20-spir64-fp64.pcm"},
+                 {OPENCL_C_30_SPIR64_FP64_PCM, "opencl-c-30-spir64-fp64.pcm"},
+                 {OPENCL_C_MODULE_MAP, "module.modulemap"}};
 
   Result.clear();
   Result.reserve(sizeof(Headers) / sizeof(*Headers));
 
   ResourceManager &RM = ResourceManager::instance();
-
-  for (auto Header:Headers) {
+  for (auto Header : Headers) {
     Resource R = RM.get_resource(Header.Name, Header.ID, "PCM", true);
     if (!R) {
-      assert(0 && "Resource not found");
+      assert(false && "Resource not found");
       return false;
     }
 
@@ -241,7 +250,7 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
           new llvm::vfs::InMemoryFileSystem);
       OverlayFS->pushOverlay(MemFS);
 
-      compiler->createFileManager(OverlayFS);
+      compiler->createFileManager(std::move(OverlayFS));
       compiler->createSourceManager(compiler->getFileManager());
 
       // Create compiler invocation from user args before trickering with it
@@ -252,8 +261,6 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
       ProcessWarningOptions(*Diags, compiler->getDiagnosticOpts());
 
       // Map memory buffers to a virtual file system
-
-      // Source file
       MemFS->addFile(
           optionsParser.getSourceName(), (time_t)0,
           llvm::MemoryBuffer::getMemBuffer(
@@ -312,7 +319,7 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
         if (pBinaryResult) {
           *pBinaryResult = nullptr;
         }
-        assert(!"Failed to read just compiled LLVM IR!");
+        assert(false && "Failed to read just compiled LLVM IR!");
         return CL_COMPILE_PROGRAM_FAILURE;
       }
       pResult->getIRBufferRef().clear();

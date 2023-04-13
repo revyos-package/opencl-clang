@@ -16,18 +16,24 @@ Copyright (c) Intel Corporation (2009-2017).
 
 \*****************************************************************************/
 
-#include "common_clang.h"
+#include "opencl_clang.h"
 #include "options.h"
 
 #include "clang/Driver/Options.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Mutex.h"
 
+#include <algorithm>
+#include <map>
 #include <sstream>
 
-#define PREFIX(NAME, VALUE) const char *const NAME[] = VALUE;
+#define PREFIX(NAME, VALUE)                                                    \
+  static constexpr llvm::StringLiteral NAME##_init[] = VALUE;                  \
+  static constexpr llvm::ArrayRef<llvm::StringLiteral> NAME(                   \
+      NAME##_init, std::size(NAME##_init) - 1);
 #define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
                HELPTEXT, METAVAR, VALUES)
 #include "opencl_clang_options.inc"
@@ -38,14 +44,14 @@ using namespace llvm::opt;
 
 static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileOptionsMutex;
 
-static const OptTable::Info ClangOptionsInfoTable[] = {
+static constexpr OptTable::Info ClangOptionsInfoTable[] = {
 #define PREFIX(NAME, VALUE)
 #define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
                HELPTEXT, METAVAR, VALUES)                                      \
   {                                                                            \
     PREFIX, NAME, HELPTEXT, METAVAR, OPT_COMPILE_##ID,                         \
         llvm::opt::Option::KIND##Class, PARAM, FLAGS, OPT_COMPILE_##GROUP,     \
-        OPT_COMPILE_##ALIAS, ALIASARGS                                         \
+        OPT_COMPILE_##ALIAS, ALIASARGS, VALUES                                 \
   }                                                                            \
   ,
 #include "opencl_clang_options.inc"
@@ -64,6 +70,7 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
                                                    ArgsVector &effectiveArgs) {
   // Reset args
   int iCLStdSet = 0;
+  bool fp64Enabled = false;
   std::string szTriple;
   std::string sourceName(llvm::Twine(s_progID++).str());
 
@@ -154,13 +161,17 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
       // default:
       // assert(false && "some unknown argument");
     case OPT_COMPILE_profiling:
-    case OPT_COMPILE_g_Flag:
-      effectiveArgs.push_back("-debug-info-kind=limited");
-      effectiveArgs.push_back("-dwarf-version=4");
-      break;
     case OPT_COMPILE_gline_tables_only_Flag:
       effectiveArgs.push_back("-debug-info-kind=line-tables-only");
       effectiveArgs.push_back("-dwarf-version=4");
+      break;
+    case OPT_COMPILE_g_Flag:
+      effectiveArgs.push_back("-debug-info-kind=limited");
+      effectiveArgs.push_back("-dwarf-version=4");
+#ifdef _WIN32
+      // Do not use column information on Windows.
+      effectiveArgs.push_back("-gno-column-info");
+#endif
       break;
     }
   }
@@ -217,13 +228,131 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
   // OpenCL v2.0 s6.9.u - Implicit function declaration is not supported.
   // Behavior of clang is changed and now there is only warning about
   // implicit function declarations. To be more user friendly and avoid
-  // unexpected indirect function calls in IR, let's force this warning to
+  // unexpected indirect function calls in BE, let's force this warning to
   // error.
   effectiveArgs.push_back("-Werror=implicit-function-declaration");
 
   // add the extended options verbatim
   std::back_insert_iterator<ArgsVector> it(std::back_inserter(effectiveArgs));
   quoted_tokenize(it, pszOptionsEx, " \t", '"', '\x00');
+
+  for (auto it = effectiveArgs.begin(), end = effectiveArgs.end(); it != end;
+       ++it) {
+    if (it->compare("-Dcl_khr_fp64") == 0 || it->compare("-D cl_khr_fp64=1") == 0)
+      fp64Enabled = true;
+    else if (it->compare("-U cl_khr_fp64") == 0)
+      fp64Enabled = false;
+    // Find last position that enables or disables cl_khr_fp64
+    else if (it->find("cl_khr_fp64") != std::string::npos) {
+      auto NegFp64 = it->rfind("-cl_khr_fp64");
+      auto PosFp64 = it->rfind("+cl_khr_fp64");
+      if(NegFp64 != std::string::npos && PosFp64 != std::string::npos)
+         fp64Enabled = PosFp64 > NegFp64;
+      else if(NegFp64 != std::string::npos)
+        fp64Enabled = false;
+      else
+        fp64Enabled = true;
+    }
+  }
+
+#ifdef PCH_EXTENSION
+  std::map<std::string, bool> extMap;
+  llvm::SmallVector<llvm::StringRef> extVec;
+  llvm::SplitString(PCH_EXTENSION, extVec, ",");
+  for(auto ext : extVec)
+    extMap.insert({ext.str(), true});
+#else
+  std::map<std::string, bool> extMap{
+      {"cl_khr_3d_image_writes", true},
+      {"cl_khr_depth_images", true},
+      {"cl_khr_fp16", true},
+#ifdef _WIN32
+      // cl_khr_gl_msaa_sharing is only supported on Windows [NEO].
+      {"cl_khr_gl_msaa_sharing", true},
+#endif
+      {"cl_khr_global_int32_base_atomics", true},
+      {"cl_khr_global_int32_extended_atomics", true},
+      {"cl_khr_int64_base_atomics", true},
+      {"cl_khr_int64_extended_atomics", true},
+      {"cl_khr_local_int32_base_atomics", true},
+      {"cl_khr_local_int32_extended_atomics", true},
+      {"cl_khr_mipmap_image", true},
+      {"cl_khr_mipmap_image_writes", true},
+      {"cl_khr_subgroups", true},
+      {"cl_intel_device_side_avc_motion_estimation", true},
+      {"cl_intel_planar_yuv", true},
+      {"cl_intel_subgroups", true},
+      {"cl_intel_subgroups_short", true}};
+#endif
+
+  auto parseClExt = [&](const std::string &clExtStr) {
+    llvm::StringRef clExtRef(clExtStr);
+    clExtRef.consume_front("-cl-ext=");
+    llvm::SmallVector<llvm::StringRef, 32> parsedExt;
+    clExtRef.split(parsedExt, ',');
+    for (auto ext : parsedExt) {
+      char sign = ext.front();
+      bool enabled = sign != '-';
+      llvm::StringRef extName = ext;
+      if (sign == '+' || sign == '-')
+        extName = extName.drop_front();
+      if (extName == "all") {
+        for (auto &p : extMap)
+          p.second = enabled;
+        continue;
+      }
+      auto it = extMap.find(extName.str());
+      if (it != extMap.end())
+        it->second = enabled;
+    }
+  };
+  std::for_each(effectiveArgs.begin(), effectiveArgs.end(),
+                [&](const ArgsVector::value_type &a) {
+                  if (a.find("-cl-ext=") == 0)
+                    parseClExt(a);
+                });
+  // extension is enabled in PCH but disabled or not specifed in options =>
+  // disable pch
+  bool useModules =
+      !std::any_of(extMap.begin(), extMap.end(),
+                   [](const auto &p) { return p.second == false; });
+
+  if (useModules) {
+    effectiveArgs.push_back("-fmodules");
+    if (!fp64Enabled) {
+      if (szTriple.find("spir64") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir64.pcm");
+      } else if (szTriple.find("spir") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir.pcm");
+      }
+    } else {
+      if (szTriple.find("spir64") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir64-fp64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir64-fp64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir64-fp64.pcm");
+      } else if (szTriple.find("spir") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir-fp64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir-fp64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir-fp64.pcm");
+      }
+    }
+  }
 
   // add source name to options as an input file
   assert(!sourceName.empty() && "Empty source name.");
