@@ -1,2 +1,3 @@
 0001-Fix-standalone-build-415.patch
 0002-Support-llvm-headers-in-LLVM_LIBRARY_DIRS-clang-LLVM.patch
+0003-Bump-CMAKE_CXX_STANDARD-to-17-416.patch
