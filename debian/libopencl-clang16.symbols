@@ -1,4 +1,4 @@
-libopencl-clang.so.15 #PACKAGE# #MINVER#
+libopencl-clang.so.16 #PACKAGE# #MINVER#
 * Build-Depends-Package: libopencl-clang-16-dev
  CheckCompileOptions@Base 0
  Compile@Base 0

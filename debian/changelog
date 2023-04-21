@@ -3,6 +3,7 @@ opencl-clang-16 (16.0.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * Fork source package as opencl-clang-16.
   * Rename binary packages: *15* => *16*.
+  * Build with llvm 16.
 
  -- Andreas Beckmann <anbe@debian.org>  Fri, 21 Apr 2023 10:32:50 +0200
 

@@ -7,12 +7,13 @@ Uploaders:
  Andreas Beckmann <anbe@debian.org>,
 Build-Depends: debhelper-compat (= 13),
  cmake,
+ libz-dev,
 # keep the clang/llvm version in sync
- clang-15,
- libclang-15-dev,
- libclang-cpp15-dev,
- libllvmspirvlib-15-dev,
- llvm-15-dev,
+ clang-16,
+ libclang-16-dev,
+ libclang-cpp16-dev,
+ libllvmspirvlib-16-dev,
+ llvm-16-dev,
 Rules-Requires-Root: no
 Standards-Version: 4.6.2
 Homepage: https://github.com/intel/opencl-clang
