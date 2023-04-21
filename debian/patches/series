@@ -1,1 +1,2 @@
 0001-Fix-standalone-build-415.patch
+0002-Support-llvm-headers-in-LLVM_LIBRARY_DIRS-clang-LLVM.patch
