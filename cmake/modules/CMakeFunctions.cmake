@@ -2,17 +2,17 @@
 # Set compiler RTTI options according to the given flag
 #
 macro(use_rtti val)
-    if( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        if( ${val} )
-            llvm_replace_compiler_option(CMAKE_CXX_FLAGS "-fno-rtti" "-frtti")
-        else()
-            llvm_replace_compiler_option(CMAKE_CXX_FLAGS "-frtti" "-fno-rtti" )
-        endif()
-    else(MSVC)
+    if (MSVC)
         if( ${val} )
             llvm_replace_compiler_option(CMAKE_CXX_FLAGS "/GR-" "/GR")
         else()
             llvm_replace_compiler_option(CMAKE_CXX_FLAGS "/GR" "/GR-" )
+        endif()
+    else () # G++ or clang or icx
+        if( ${val} )
+            llvm_replace_compiler_option(CMAKE_CXX_FLAGS "-fno-rtti" "-frtti")
+        else()
+            llvm_replace_compiler_option(CMAKE_CXX_FLAGS "-frtti" "-fno-rtti" )
         endif()
     endif()
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE )
@@ -22,19 +22,19 @@ endmacro(use_rtti)
 # Set compiler Exception Handling options according to the given flag
 #
 macro(use_eh val)
-    if( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        if( ${val} )
-            remove_definitions( -fno-exceptions )
-        else()
-            add_definitions( -fno-exceptions )
-        endif()
-    else(MSVC)
+    if (MSVC)
         if( ${val} )
               llvm_replace_compiler_option(CMAKE_CXX_FLAGS "/EHs-c-" "/EHsc" )
               add_definitions( /D_HAS_EXCEPTIONS=1 )
         else()
               llvm_replace_compiler_option(CMAKE_CXX_FLAGS "/EHsc" "/EHs-c-")
               add_definitions( /D_HAS_EXCEPTIONS=0 )
+        endif()
+    else () # G++ or clang or icx
+        if( ${val} )
+            remove_definitions( -fno-exceptions )
+        else()
+            add_definitions( -fno-exceptions )
         endif()
     endif()
 endmacro(use_eh)
@@ -57,6 +57,7 @@ function(is_backport_patch_present patch_path repo_dir patch_in_branch)
         WORKING_DIRECTORY ${repo_dir}
         RESULT_VARIABLE patch_not_in_branches
         OUTPUT_QUIET
+        ERROR_QUIET
         )
     if(patch_not_in_branches)
         set(patch_in_branch False PARENT_SCOPE) # The patch is not present in local branch
@@ -73,6 +74,7 @@ function(is_valid_revision repo_dir revision return_val)
         COMMAND ${GIT_EXECUTABLE} log -1 ${revision}
         WORKING_DIRECTORY ${repo_dir}
         RESULT_VARIABLE output_var
+        ERROR_QUIET
         OUTPUT_QUIET
         )
     if(${output_var} EQUAL 0)
@@ -87,11 +89,8 @@ endfunction()
 # Then all patches from the `patches_dir` are committed to the `target_branch`.
 # Does nothing if the `target_branch` is already checked out in the `repo_dir`.
 #
-function(apply_patches repo_dir patches_dir base_revision target_branch ret)
-    foreach(patches_dir ${patches_dir})
-        file(GLOB patches_in_dir ${patches_dir}/*.patch)
-        list(APPEND patches ${patches_in_dir})
-    endforeach()
+function(apply_patches repo_dir patches_dir base_revision target_branch)
+    file(GLOB patches ${patches_dir}/*.patch)
     if(NOT patches)
         message(STATUS "[OPENCL-CLANG] No patches in ${patches_dir}")
         return()
@@ -103,11 +102,10 @@ function(apply_patches repo_dir patches_dir base_revision target_branch ret)
         COMMAND ${GIT_EXECUTABLE} rev-parse --verify --no-revs -q ${target_branch}
         WORKING_DIRECTORY ${repo_dir}
         RESULT_VARIABLE patches_needed
+        ERROR_QUIET
         OUTPUT_QUIET
     )
-    if(patches_needed EQUAL 128) # not a git repo
-        set(ret_not_git_repo 1)
-	elseif(patches_needed) # The target branch doesn't exist
+    if(patches_needed) # The target branch doesn't exist
         list(SORT patches)
         is_valid_revision(${repo_dir} ${base_revision} exists_base_rev)
 
@@ -117,6 +115,7 @@ function(apply_patches repo_dir patches_dir base_revision target_branch ret)
                 WORKING_DIRECTORY ${repo_dir}
                 OUTPUT_VARIABLE repo_head
                 OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
                 )
             message(STATUS "[OPENCL-CLANG] ref ${base_revision} not exists in repository, using current HEAD:${repo_head}")
             set(base_revision ${repo_head})
@@ -136,29 +135,21 @@ function(apply_patches repo_dir patches_dir base_revision target_branch ret)
                 message(STATUS "[OPENCL-CLANG] Patch ${patch} is already in local branch - ignore patching")
             else()
                 execute_process( # Apply the patch
-                    COMMAND ${GIT_EXECUTABLE} am --3way --ignore-whitespace -C0 ${patch}
+                    COMMAND ${GIT_EXECUTABLE} am --3way --ignore-whitespace ${patch}
                     WORKING_DIRECTORY ${repo_dir}
                     OUTPUT_VARIABLE patching_log
-                    RESULT_VARIABLE ret_apply_patch
+                    ERROR_QUIET
                 )
                 message(STATUS "[OPENCL-CLANG] Not present - ${patching_log}")
-                if (ret_apply_patch)
-                    break()
-                endif()
             endif()
         endforeach(patch)
     else() # The target branch already exists
         execute_process( # Check it out
             COMMAND ${GIT_EXECUTABLE} checkout ${target_branch}
             WORKING_DIRECTORY ${repo_dir}
+            ERROR_QUIET
             OUTPUT_QUIET
-            RESULT_VARIABLE ret_check_out
         )
-    endif()
-	if (NOT (ret_not_git_repo OR ret_check_out OR ret_apply_patch))
-        set(${ret} True PARENT_SCOPE)
-    else()
-        message(FATAL_ERROR "[OPENCL-CLANG] Failed to apply patch!")
     endif()
 endfunction()
 

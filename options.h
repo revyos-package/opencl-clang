@@ -12,14 +12,14 @@ Copyright (c) Intel Corporation (2009-2017).
     use of the code. No license, express or implied, by estoppel or otherwise,
     to any intellectual property rights is granted herein.
 
-  \file common_clang.h
+  \file opencl_clang.h
 
   \brief Defines the common structures for both compile and link options parsing
 
 \*****************************************************************************/
 
-#ifndef COMMON_CLANG_OPTIONS_H
-#define COMMON_CLANG_OPTIONS_H
+#ifndef OPENCL_CLANG_OPTIONS_H
+#define OPENCL_CLANG_OPTIONS_H
 
 #include "llvm/Option/Arg.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -71,6 +71,8 @@ public:
 
   const char *MakeArgStringRef(llvm::StringRef str) const override;
 
+  virtual ~OpenCLArgList() {}
+
 private:
   /// List of argument strings used by the contained Args.
   ///
@@ -93,10 +95,10 @@ private:
 //
 // OpenCL specific OptTable
 //
-class OpenCLOptTable : public llvm::opt::OptTable {
+class OpenCLOptTable : public llvm::opt::GenericOptTable {
 public:
   OpenCLOptTable(llvm::ArrayRef<Info> pOptionInfos)
-      : OptTable(pOptionInfos) {}
+      : llvm::opt::GenericOptTable(pOptionInfos) {}
 
   OpenCLArgList *ParseArgs(const char *szOptions, unsigned &missingArgIndex,
                            unsigned &missingArgCount) const;
