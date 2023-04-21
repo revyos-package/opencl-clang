@@ -1,4 +1,4 @@
-Source: opencl-clang-15
+Source: opencl-clang-16
 Section: libdevel
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
@@ -17,7 +17,7 @@ Rules-Requires-Root: no
 Standards-Version: 4.6.2
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm15/main
+Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm16/main
 
 Package: libopencl-clang15
 Architecture: any
