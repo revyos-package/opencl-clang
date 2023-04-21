@@ -5,6 +5,7 @@ opencl-clang-16 (16.0.0-1) UNRELEASED; urgency=medium
   * Rename binary packages: *15* => *16*.
   * Build with llvm 16.
   * Fix building with distribution-provided llvm/clang.
+  * Update .symbols control file.
 
  -- Andreas Beckmann <anbe@debian.org>  Fri, 21 Apr 2023 10:32:50 +0200
 
