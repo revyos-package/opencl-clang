@@ -1,0 +1,93 @@
+Author: Andreas Beckmann <anbe@debian.org>
+Description: fix linking against distribution-provided llvm shared library
+Bug: https://github.com/intel/opencl-clang/issues/422
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -292,10 +292,58 @@ else()
+   )
+ endif()
+ 
+-add_library(${TARGET_NAME} SHARED
++if(LLVM_LINK_LLVM_DYLIB)
++set(OPENCL_CLANG_LLVM_MODULES all)
++else(LLVM_LINK_LLVM_DYLIB)
++set(OPENCL_CLANG_LLVM_MODULES
++                       LLVMX86CodeGen
++                       LLVMX86AsmParser
++                       LLVMX86Desc
++                       LLVMX86Info
++                       LLVMX86Disassembler
++                       LLVMAnalysis
++                       LLVMCodeGen
++                       LLVMCore
++                       LLVMipo
++                       LLVMInstCombine
++                       LLVMInstrumentation
++                       LLVMMC
++                       LLVMMCParser
++                       LLVMObjCARCOpts
++                       LLVMOption
++                       LLVMScalarOpts
++                       LLVMSupport
++                       LLVMTransformUtils
++                       LLVMVectorize
++                       LLVMAsmPrinter
++                       LLVMSelectionDAG
++                       LLVMMCDisassembler
++                       LLVMProfileData
++                       LLVMObject
++                       LLVMBitWriter
++                       LLVMIRReader
++                       LLVMAsmParser
++                       LLVMTarget
++                       LLVMBitReader
++                      )
++if ("NVPTX" IN_LIST LLVM_TARGETS_TO_BUILD)
++    list(APPEND OPENCL_CLANG_LLVM_MODULES LLVMNVPTXCodeGen LLVMNVPTXDesc LLVMNVPTXInfo)
++endif()
++if ("AMDGPU" IN_LIST LLVM_TARGETS_TO_BUILD)
++    list(APPEND OPENCL_CLANG_LLVM_MODULES LLVMAMDGPUCodeGen LLVMAMDGPUAsmParser LLVMAMDGPUDesc LLVMAMDGPUInfo)
++endif()
++endif(LLVM_LINK_LLVM_DYLIB)
++
++add_llvm_library(${TARGET_NAME} SHARED
+     ${TARGET_INCLUDE_FILES}
+     ${TARGET_SOURCE_FILES}
+     $<TARGET_OBJECTS:cl_headers>
++
++  DEPENDS CClangCompileOptions
++  LINK_COMPONENTS
++    ${OPENCL_CLANG_LLVM_MODULES}
++  LINK_LIBS
++    ${OPENCL_CLANG_LINK_LIBS}
+ )
+ 
+ # Same CRT compile option are reqiured to avoid link errors on Windows.
+@@ -306,8 +354,6 @@ if(COMMAND set_msvc_crt_flags)
+     set_msvc_crt_flags(${TARGET_NAME})
+ endif()
+ 
+-add_dependencies(${TARGET_NAME} CClangCompileOptions)
+-
+ if (WIN32)
+     # Enable compiler generation of Control Flow Guard security checks.
+     target_compile_options(${TARGET_NAME} PUBLIC "/guard:cf")
+@@ -322,8 +368,7 @@ elseif(UNIX)
+         LINK_FLAGS " -Wl,--no-undefined")
+ endif(WIN32)
+ 
+-# Enable new IN_LIST operator.
+-cmake_policy(SET CMP0057 NEW)
++if (FALSE)
+ set(OTHER_LIBRARIES)
+ if ("NVPTX" IN_LIST LLVM_TARGETS_TO_BUILD)
+     list(APPEND OTHER_LIBRARIES LLVMNVPTXCodeGen LLVMNVPTXDesc LLVMNVPTXInfo)
+@@ -366,6 +411,7 @@ target_link_libraries( ${TARGET_NAME}
+                        LLVMBitReader
+                        ${OTHER_LIBRARIES}
+                       )
++endif()
+ 
+ install(FILES opencl_clang.h
+         DESTINATION include/cclang
