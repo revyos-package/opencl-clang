@@ -1,4 +1,4 @@
-opencl-clang-16 (16.0.0-1) UNRELEASED; urgency=medium
+opencl-clang-16 (16.0.0-1) experimental; urgency=medium
 
   * New upstream release.
   * Fork source package as opencl-clang-16.
@@ -6,8 +6,9 @@ opencl-clang-16 (16.0.0-1) UNRELEASED; urgency=medium
   * Build with llvm 16.
   * Fix building with distribution-provided llvm/clang.
   * Update .symbols control file.
+  * Upload to experimental.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 21 Apr 2023 10:32:50 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 24 Apr 2023 15:46:58 +0200
 
 opencl-clang-15 (15.0.0-2) unstable; urgency=medium
 
