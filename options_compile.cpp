@@ -20,6 +20,7 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "options.h"
 
 #include "clang/Driver/Options.h"
+#include "llvm/ADT/SmallSet.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
@@ -42,7 +43,7 @@ Copyright (c) Intel Corporation (2009-2017).
 
 using namespace llvm::opt;
 
-static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileOptionsMutex;
+extern llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
 static constexpr OptTable::Info ClangOptionsInfoTable[] = {
 #define PREFIX(NAME, VALUE)
@@ -259,7 +260,7 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
   std::map<std::string, bool> extMap;
   llvm::SmallVector<llvm::StringRef> extVec;
   llvm::SplitString(PCH_EXTENSION, extVec, ",");
-  for(auto ext : extVec)
+  for (auto &ext : extVec)
     extMap.insert({ext.str(), true});
 #else
   std::map<std::string, bool> extMap{
@@ -287,10 +288,12 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
 
   auto parseClExt = [&](const std::string &clExtStr) {
     llvm::StringRef clExtRef(clExtStr);
-    clExtRef.consume_front("-cl-ext=");
+    bool hasPrefix = clExtRef.consume_front("-cl-ext=");
+    assert(hasPrefix && "clExtRef doesn't start with \"-cl-ext\" prefix");
+    (void)hasPrefix;
     llvm::SmallVector<llvm::StringRef, 32> parsedExt;
     clExtRef.split(parsedExt, ',');
-    for (auto ext : parsedExt) {
+    for (auto &ext : parsedExt) {
       char sign = ext.front();
       bool enabled = sign != '-';
       llvm::StringRef extName = ext;
@@ -306,11 +309,30 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
         it->second = enabled;
     }
   };
+  llvm::SmallSet<llvm::StringRef, 32> parsedOclCFeatures;
   std::for_each(effectiveArgs.begin(), effectiveArgs.end(),
                 [&](const ArgsVector::value_type &a) {
                   if (a.find("-cl-ext=") == 0)
                     parseClExt(a);
+		  else if (a.find("-D__opencl_c_") == 0)
+		    parsedOclCFeatures.insert(a);
                 });
+
+  // "opencl-c-base.h" unconditionally enables a list of so-called "optional
+  // core" language features. We need to undef those that aren't explicitly
+  // defined within the compilation command (which would suggest that the
+  // target platform supports the corresponding feature).
+  const char* optionalCoreOclCFeaturesList[] = {
+      "__opencl_c_work_group_collective_functions",
+      "__opencl_c_atomic_order_seq_cst",
+      "__opencl_c_atomic_scope_device",
+      "__opencl_c_atomic_scope_all_devices",
+      "__opencl_c_read_write_images" };
+  for (std::string OclCFeature : optionalCoreOclCFeaturesList) {
+    if (!parsedOclCFeatures.contains(std::string("-D") + OclCFeature))
+      effectiveArgs.push_back(std::string("-D__undef_") + OclCFeature);
+  }
+
   // extension is enabled in PCH but disabled or not specifed in options =>
   // disable pch
   bool useModules =
@@ -439,7 +461,7 @@ extern "C" CC_DLL_EXPORT bool CheckCompileOptions(const char *pszOptions,
                                                   size_t uiUnknownOptionsSize) {
   // LLVM doesn't guarantee thread safety,
   // therefore we serialize execution of LLVM code.
-  llvm::sys::SmartScopedLock<true> compileOptionsGuard {*compileOptionsMutex};
+  llvm::sys::SmartScopedLock<true> compileOptionsGuard{*compileMutex};
 
   try {
     CompileOptionsParser optionsParser("200");

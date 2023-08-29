@@ -31,13 +31,11 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "llvm/IR/Metadata.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/Bitcode/BitcodeReader.h"
-#include "llvm/Linker/Linker.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Threading.h"
-#include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Mutex.h"
 #include "clang/Basic/LangOptions.h"
@@ -47,8 +45,6 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/FrontendTool/Utils.h"
-#include "clang/Driver/DriverDiagnostic.h"
-#include "clang/Serialization/ModuleManager.h"
 #ifdef USE_PREBUILT_LLVM
 #include "LLVMSPIRVLib/LLVMSPIRVLib.h"
 #else // USE_PREBUILT_LLVM
@@ -77,35 +73,21 @@ Copyright (c) Intel Corporation (2009-2017).
 
 using namespace Intel::OpenCL::ClangFE;
 
-static volatile bool lazyCCInit =
-    true; // the flag must be 'volatile' to prevent caching in a CPU register
-static llvm::sys::Mutex lazyCCInitMutex;
+llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
-static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileMutex;
-
-void CommonClangTerminate() { llvm::llvm_shutdown(); }
+void OpenCLClangTerminate() { llvm::llvm_shutdown(); }
 
 // This function mustn't be invoked from a static object constructor,
 // from a DllMain function (Windows specific), or from a function
 // w\ __attribute__ ((constructor)) (Linux specific).
-void CommonClangInitialize() {
-  if (lazyCCInit) {
-    llvm::sys::ScopedLock lock(lazyCCInitMutex);
-
-    if (lazyCCInit) {
-      // CommonClangTerminate calls llvm_shutdown to deallocate resources used
-      // by LLVM libraries. llvm_shutdown uses static mutex to make it safe for
-      // multi-threaded envirounment and LLVM libraries user is expected call
-      // llvm_shutdown before static object are destroyed, so we use atexit to
-      // satisfy this requirement.
-      atexit(CommonClangTerminate);
-      llvm::InitializeAllTargets();
-      llvm::InitializeAllAsmPrinters();
-      llvm::InitializeAllAsmParsers();
-      llvm::InitializeAllTargetMCs();
-      lazyCCInit = false;
-    }
-  }
+void OpenCLClangInitialize() {
+  // OpenCLClangTerminate calls llvm_shutdown to deallocate resources used
+  // by LLVM libraries. llvm_shutdown uses static mutex to make it safe for
+  // multi-threaded envirounment and LLVM libraries user is expected call
+  // llvm_shutdown before static object are destroyed, so we use atexit to
+  // satisfy this requirement.
+  llvm::once_flag OnceFlag;
+  llvm::call_once(OnceFlag, []() { atexit(OpenCLClangTerminate); });
 }
 
 static bool GetHeaders(std::vector<Resource> &Result) {
@@ -205,9 +187,12 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
   PrintCompileOptions(pszOptions, pszOptionsEx, pszOpenCLVer, pszProgramSource);
 
   // Lazy initialization
-  CommonClangInitialize();
+  OpenCLClangInitialize();
 
   try {
+#ifdef _WIN32
+    llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
     std::unique_ptr<OCLFEBinaryResult> pResult(new OCLFEBinaryResult());
 
     // Create the clang compiler
@@ -219,8 +204,9 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
     // Prepare error log
     llvm::raw_string_ostream err_ostream(pResult->getLogRef());
     {
-      llvm::sys::SmartScopedLock<true> compileGuard {*compileMutex};
-
+#ifndef _WIN32
+      llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
       // Parse options
       optionsParser.processOptions(pszOptions, pszOptionsEx);
 
@@ -337,7 +323,9 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
       err_ostream.flush();
     }
     {
-      llvm::sys::SmartScopedLock<true> compileGuard {*compileMutex};
+#ifndef _WIN32
+      llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
       if (pBinaryResult) {
         *pBinaryResult = pResult.release();
       }

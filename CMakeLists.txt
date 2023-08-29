@@ -35,7 +35,7 @@ set(CMAKE_MODULE_PATH
 
 include(CMakeFunctions)
 
-if(LLVM_USE_HOST_TOOLS AND OPENCL_CLANG_BUILD_EXTERNAL)
+if(CMAKE_CROSSCOMPILING AND OPENCL_CLANG_BUILD_EXTERNAL)
   include(CrossCompile)
   llvm_create_cross_target(${PROJECT_NAME} NATIVE "" Release)
 endif()
@@ -58,7 +58,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       ${CMAKE_MODULE_PATH}
       ${LLVM_CMAKE_DIR})
 
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
     option(LLVMSPIRV_INCLUDED_IN_LLVM
@@ -88,9 +88,15 @@ use_rtti(FALSE)
 use_eh(TRUE)
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(ADDR 32)
+  set(ADDR 32)
+elseif (CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(ADDR 64)
 else ()
-    set(ADDR 64)
+  # CMAKE_SIZEOF_VOID_P might not be set on windows x86 in in-tree build
+  message(WARNING "[OPENCL-CLANG] CMAKE_SIZEOF_VOID_P is not set")
+  if (WIN32 AND LLVM_BUILD_32_BITS)
+    set(ADDR 32)
+  endif()
 endif (CMAKE_SIZEOF_VOID_P EQUAL 4)
 
 # set windows binary suffix
@@ -106,11 +112,11 @@ if (NOT DEFINED OPENCL_CLANG_LIBRARY_NAME)
 endif()
 set(TARGET_NAME ${OPENCL_CLANG_LIBRARY_NAME}${BUILD_PLATFORM} )
 
-# PCH_EXTENSION can override PCH extension map in options_compile.cpp.
+# OPENCL_CLANG_PCH_EXTENSION can override PCH extension map in options_compile.cpp.
 # Example: "cl_khr_3d_image_writes,cl_khr_depth_images"
-set(PCH_EXTENSION "" CACHE STRING "Comma-separated list of OpenCL extensions")
-if (NOT "${PCH_EXTENSION}" STREQUAL "")
-  add_definitions(-DPCH_EXTENSION="${PCH_EXTENSION}")
+set(OPENCL_CLANG_PCH_EXTENSION "" CACHE STRING "Comma-separated list of OpenCL extensions")
+if (NOT "${OPENCL_CLANG_PCH_EXTENSION}" STREQUAL "")
+  add_definitions(-DPCH_EXTENSION="${OPENCL_CLANG_PCH_EXTENSION}")
 endif()
 
 if(NOT USE_PREBUILT_LLVM)
@@ -153,9 +159,9 @@ if(NOT USE_PREBUILT_LLVM)
         )
     endif()
 
-    set(CLANG_BASE_REVISION release/16.x)
-    set(SPIRV_BASE_REVISION llvm_release_160)
-    set(TARGET_BRANCH "ocl-open-160")
+    set(CLANG_BASE_REVISION release/17.x)
+    set(SPIRV_BASE_REVISION llvm_release_170)
+    set(TARGET_BRANCH "ocl-open-170")
 
     apply_patches(${CLANG_SOURCE_DIR}
                   ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
@@ -292,21 +298,23 @@ else()
   )
 endif()
 
-add_library(${TARGET_NAME} SHARED
-    ${TARGET_INCLUDE_FILES}
-    ${TARGET_SOURCE_FILES}
-    $<TARGET_OBJECTS:cl_headers>
-)
-
-# Same CRT compile option are reqiured to avoid link errors on Windows.
-# MD and MDd are choosed by default for release and debug build in LLVM.
-# If users set MT or MTd flags, they also need to add the flags for
-# opencl-clang sources using a custom macro set_msvc_crt_flags.
-if(COMMAND set_msvc_crt_flags)
-    set_msvc_crt_flags(${TARGET_NAME})
+set(OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL "" CACHE STRING "Space-separated list of LLVM libraries to exclude from all")
+llvm_map_components_to_libnames(ALL_LLVM_LIBS all)
+if (NOT "${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL}" STREQUAL "")
+  list(REMOVE_ITEM ALL_LLVM_LIBS ${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL})
 endif()
+list(APPEND OPENCL_CLANG_LINK_LIBS ${ALL_LLVM_LIBS})
 
-add_dependencies(${TARGET_NAME} CClangCompileOptions)
+add_llvm_library(${TARGET_NAME} SHARED
+  ${TARGET_INCLUDE_FILES}
+  ${TARGET_SOURCE_FILES}
+  $<TARGET_OBJECTS:cl_headers>
+
+  DEPENDS CClangCompileOptions
+
+  LINK_LIBS
+    ${OPENCL_CLANG_LINK_LIBS}
+  )
 
 if (WIN32)
     # Enable compiler generation of Control Flow Guard security checks.
@@ -321,51 +329,6 @@ elseif(UNIX)
     set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
         LINK_FLAGS " -Wl,--no-undefined")
 endif(WIN32)
-
-# Enable new IN_LIST operator.
-cmake_policy(SET CMP0057 NEW)
-set(OTHER_LIBRARIES)
-if ("NVPTX" IN_LIST LLVM_TARGETS_TO_BUILD)
-    list(APPEND OTHER_LIBRARIES LLVMNVPTXCodeGen LLVMNVPTXDesc LLVMNVPTXInfo)
-endif()
-if ("AMDGPU" IN_LIST LLVM_TARGETS_TO_BUILD)
-    list(APPEND OTHER_LIBRARIES LLVMAMDGPUCodeGen LLVMAMDGPUAsmParser LLVMAMDGPUDesc LLVMAMDGPUInfo)
-endif()
-
-target_link_libraries( ${TARGET_NAME}
-                       LINK_PRIVATE
-                       ${OPENCL_CLANG_LINK_LIBS}
-                       LLVMX86CodeGen
-                       LLVMX86AsmParser
-                       LLVMX86Desc
-                       LLVMX86Info
-                       LLVMX86Disassembler
-                       LLVMAnalysis
-                       LLVMCodeGen
-                       LLVMCore
-                       LLVMipo
-                       LLVMInstCombine
-                       LLVMInstrumentation
-                       LLVMMC
-                       LLVMMCParser
-                       LLVMObjCARCOpts
-                       LLVMOption
-                       LLVMScalarOpts
-                       LLVMSupport
-                       LLVMTransformUtils
-                       LLVMVectorize
-                       LLVMAsmPrinter
-                       LLVMSelectionDAG
-                       LLVMMCDisassembler
-                       LLVMProfileData
-                       LLVMObject
-                       LLVMBitWriter
-                       LLVMIRReader
-                       LLVMAsmParser
-                       LLVMTarget
-                       LLVMBitReader
-                       ${OTHER_LIBRARIES}
-                      )
 
 install(FILES opencl_clang.h
         DESTINATION include/cclang

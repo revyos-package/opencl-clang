@@ -1,6 +1,10 @@
 set(CL_HEADERS_LIB cl_headers)
-set(CLANG_COMMAND $<TARGET_FILE:clang> )
-if(LLVM_USE_HOST_TOOLS AND NOT OPENCL_CLANG_BUILD_EXTERNAL)
+if(USE_PREBUILT_LLVM)
+    find_program(CLANG_COMMAND clang PATHS ${LLVM_TOOLS_BINARY_DIR} NO_DEFAULT_PATH)
+else()
+    set(CLANG_COMMAND $<TARGET_FILE:clang>)
+endif()
+if(CMAKE_CROSSCOMPILING AND NOT OPENCL_CLANG_BUILD_EXTERNAL)
   build_native_tool(clang CLANG_COMMAND)
 endif()
 set(LINUX_RESOURCE_LINKER_COMMAND linux_resource_linker)
@@ -15,8 +19,15 @@ add_custom_command(
 endfunction(copy_file)
 
 if(USE_PREBUILT_LLVM)
-    set(OPENCL_HEADERS_DIR
-      "${LLVM_LIBRARY_DIRS}/clang/${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}.${LLVM_VERSION_PATCH}/include/")
+    if(EXISTS "${LLVM_LIBRARY_DIRS}/clang/${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}.${LLVM_VERSION_PATCH}/")
+        set(OPENCL_HEADERS_DIR
+        "${LLVM_LIBRARY_DIRS}/clang/${LLVM_VERSION_MAJOR}.${LLVM_VERSION_MINOR}.${LLVM_VERSION_PATCH}/include/")
+    elseif(EXISTS "${LLVM_LIBRARY_DIRS}/clang/${LLVM_VERSION_MAJOR}/")
+        set(OPENCL_HEADERS_DIR
+            "${LLVM_LIBRARY_DIRS}/clang/${LLVM_VERSION_MAJOR}/include/")
+    else()
+        message(FATAL_ERROR "[OPENCL-CLANG] Couldn't find prebuilt LLVM include directory.")
+    endif()
 else(USE_PREBUILT_LLVM)
     set(OPENCL_HEADERS_DIR "${CLANG_SOURCE_DIR}/lib/Headers")
 endif(USE_PREBUILT_LLVM)
