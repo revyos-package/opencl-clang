@@ -1,5 +1,5 @@
 libopencl-clang.so.16 #PACKAGE# #MINVER#
-* Build-Depends-Package: libopencl-clang-16-dev
+* Build-Depends-Package: libopencl-clang-17-dev
  CheckCompileOptions@Base 0
  Compile@Base 0
  PCM_OPENCL_C_12_SPIR64_FP64_PCM@Base 16

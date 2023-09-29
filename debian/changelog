@@ -1,6 +1,7 @@
 opencl-clang-17 (16.0.0-4) UNRELEASED; urgency=medium
 
   * Fork source package as opencl-clang-17.
+  * Rename binary packages: *16* => *17*.
 
  -- Andreas Beckmann <anbe@debian.org>  Fri, 29 Sep 2023 17:23:41 +0200
 
