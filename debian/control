@@ -9,11 +9,11 @@ Build-Depends: debhelper-compat (= 13),
  cmake,
  libz-dev,
 # keep the clang/llvm version in sync
- clang-16,
- libclang-16-dev,
- libclang-cpp16-dev,
- libllvmspirvlib-16-dev,
- llvm-16-dev,
+ clang-17,
+ libclang-17-dev,
+ libclang-cpp17-dev,
+ libllvmspirvlib-17-dev,
+ llvm-17-dev,
 Rules-Requires-Root: no
 Standards-Version: 4.6.2
 Homepage: https://github.com/intel/opencl-clang
