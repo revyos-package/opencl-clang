@@ -16,6 +16,12 @@ opencl-clang-16 (16.0.0-1) experimental; urgency=medium
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 24 Apr 2023 15:46:58 +0200
 
+opencl-clang-15 (15.0.0-3) unstable; urgency=medium
+
+  * Restrict watch file to 15.* releases.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 29 Sep 2023 15:16:45 +0200
+
 opencl-clang-15 (15.0.0-2) unstable; urgency=medium
 
   * Bump Standards-Version to 4.6.2.
