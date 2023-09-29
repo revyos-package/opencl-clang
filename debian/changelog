@@ -1,8 +1,8 @@
-opencl-clang-16 (16.0.0-3) UNRELEASED; urgency=medium
+opencl-clang-16 (16.0.0-3) unstable; urgency=medium
 
   * Restrict watch file to 16.* releases.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 29 Sep 2023 15:23:29 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 29 Sep 2023 15:28:50 +0200
 
 opencl-clang-16 (16.0.0-2) unstable; urgency=medium
 
