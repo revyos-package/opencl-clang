@@ -1,0 +1,55 @@
+From 904c9426edf5c74a44173ca6da76e59e9a940f53 Mon Sep 17 00:00:00 2001
+From: Wenju He <wenju.he@intel.com>
+Date: Tue, 26 Sep 2023 13:27:03 +0800
+Subject: [PATCH 1/5] Change LLVM version to 17.0.1
+
+---
+ CMakeLists.txt | 4 ++--
+ README.md      | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 56f4cc3..c910e8b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.13.4)
+ 
+ if(NOT DEFINED BASE_LLVM_VERSION)
+-  set(BASE_LLVM_VERSION 16.0.0)
++  set(BASE_LLVM_VERSION 17.0.1)
+ endif(NOT DEFINED BASE_LLVM_VERSION)
+ set(OPENCL_CLANG_VERSION ${BASE_LLVM_VERSION}.0)
+ 
+@@ -46,7 +46,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+     add_definitions(-DUSE_PREBUILT_LLVM)
+ 
+     if(NOT PREFERRED_LLVM_VERSION)
+-        set(PREFERRED_LLVM_VERSION "16.0.0")
++        set(PREFERRED_LLVM_VERSION "17.0.1")
+     endif(NOT PREFERRED_LLVM_VERSION)
+     message(STATUS "[OPENCL-CLANG] Looking for LLVM version ${PREFERRED_LLVM_VERSION}")
+     find_package(LLVM ${PREFERRED_LLVM_VERSION} REQUIRED)
+diff --git a/README.md b/README.md
+index 1fd60b7..385cf8e 100644
+--- a/README.md
++++ b/README.md
+@@ -70,13 +70,13 @@ make all -j`nproc`
+ 
+ ##### Preferred LLVM version
+ 
+-By default, openclc-clang's cmake script is searching for LLVM 16.0.0. You can
++By default, openclc-clang's cmake script is searching for LLVM 17.0.1. You can
+ override target version of LLVM by using the `PREFERRED_LLVM_VERSION` cmake
+ option:
+ 
+ Example:
+ ```bash
+-cmake -DPREFERRED_LLVM_VERSION="17.0.0" ../opencl-clang
++cmake -DPREFERRED_LLVM_VERSION="17.0.1" ../opencl-clang
+ ```
+ 
+ ##### Custom LLVM installation
+-- 
+2.20.1
+
