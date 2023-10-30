@@ -1,11 +1,12 @@
-opencl-clang-17 (17.0.0-1) UNRELEASED; urgency=medium
+opencl-clang-17 (17.0.0-1) experimental; urgency=medium
 
   * New upstream release.
   * Fork source package as opencl-clang-17.
   * Rename binary packages: *16* => *17*.
   * Build with llvm 17.
+  * Upload to experimental.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 29 Sep 2023 17:36:40 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 30 Oct 2023 14:25:29 +0100
 
 opencl-clang-16 (16.0.0-3) unstable; urgency=medium
 
