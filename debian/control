@@ -5,7 +5,7 @@ Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
 Uploaders:
  Timo Aaltonen <tjaalton@debian.org>,
  Andreas Beckmann <anbe@debian.org>,
-Build-Depends: debhelper-compat (= 13),
+Build-Depends: dpkg-dev (>= 1.22.5), debhelper-compat (= 13),
  cmake,
  libz-dev,
 # keep the clang/llvm version in sync
@@ -20,7 +20,10 @@ Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
 Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm16/main
 
-Package: libopencl-clang16
+Package: libopencl-clang16t64
+Provides: ${t64:Provides}
+Replaces: libopencl-clang16
+Breaks: libopencl-clang16 (<< ${source:Version})
 Architecture: any
 Multi-Arch: same
 Section: libs
@@ -34,7 +37,7 @@ Package: libopencl-clang-16-dev
 Architecture: any
 Multi-Arch: same
 Depends: ${misc:Depends},
- libopencl-clang16 (= ${binary:Version}),
+ libopencl-clang16t64 (= ${binary:Version}),
 Conflicts:
  libopencl-clang-x.y-dev,
 Breaks:
