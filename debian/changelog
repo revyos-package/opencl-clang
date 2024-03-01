@@ -21,6 +21,13 @@ opencl-clang-17 (17.0.0-1) experimental; urgency=medium
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 30 Oct 2023 14:25:29 +0100
 
+opencl-clang-16 (16.0.0-3.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.  Closes: #1062833
+
+ -- Benjamin Drung <bdrung@debian.org>  Thu, 29 Feb 2024 03:00:39 +0000
+
 opencl-clang-16 (16.0.0-3) unstable; urgency=medium
 
   * Restrict watch file to 16.* releases.
