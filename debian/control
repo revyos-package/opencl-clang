@@ -9,11 +9,11 @@ Build-Depends: debhelper-compat (= 13),
  cmake,
  libz-dev,
 # keep the clang/llvm version in sync
- clang-17,
- libclang-17-dev,
- libclang-cpp17-dev,
- libllvmspirvlib-17-dev,
- llvm-17-dev,
+ clang-18,
+ libclang-18-dev,
+ libclang-cpp18-dev,
+ libllvmspirvlib-18-dev,
+ llvm-18-dev,
 # prevent accidental backports after the 64-bit time_t transition
  dpkg-dev (>= 1.22.5),
 Rules-Requires-Root: no
