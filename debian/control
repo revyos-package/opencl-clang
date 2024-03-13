@@ -1,4 +1,4 @@
-Source: opencl-clang-17
+Source: opencl-clang-18
 Section: libdevel
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
@@ -20,7 +20,7 @@ Rules-Requires-Root: no
 Standards-Version: 4.6.2
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm17/main
+Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm18/main
 
 Package: libopencl-clang17t64
 Provides: ${t64:Provides}

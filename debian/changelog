@@ -1,3 +1,9 @@
+opencl-clang-18 (17.0.0-1) UNRELEASED; urgency=medium
+
+  * Fork source package as opencl-clang-18.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 13 Mar 2024 23:28:15 +0100
+
 opencl-clang-17 (17.0.0-3) unstable; urgency=medium
 
   * Restrict watch file to 17.* releases.
