@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13.4)
 
 if(NOT DEFINED BASE_LLVM_VERSION)
-  set(BASE_LLVM_VERSION 16.0.0)
+  set(BASE_LLVM_VERSION 17)
 endif(NOT DEFINED BASE_LLVM_VERSION)
 set(OPENCL_CLANG_VERSION ${BASE_LLVM_VERSION}.0)
 
@@ -14,8 +14,6 @@ endif(NOT DEFINED OPENCL_CLANG_BUILD_EXTERNAL)
 
 if(OPENCL_CLANG_BUILD_EXTERNAL)
   project(OPENCL_CLANG
-    VERSION
-    ${OPENCL_CLANG_VERSION}
     LANGUAGES
       CXX
       C
@@ -46,7 +44,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_definitions(-DUSE_PREBUILT_LLVM)
 
     if(NOT PREFERRED_LLVM_VERSION)
-        set(PREFERRED_LLVM_VERSION "16.0.0")
+        set(PREFERRED_LLVM_VERSION "18.1")
     endif(NOT PREFERRED_LLVM_VERSION)
     message(STATUS "[OPENCL-CLANG] Looking for LLVM version ${PREFERRED_LLVM_VERSION}")
     find_package(LLVM ${PREFERRED_LLVM_VERSION} REQUIRED)
@@ -159,9 +157,9 @@ if(NOT USE_PREBUILT_LLVM)
         )
     endif()
 
-    set(CLANG_BASE_REVISION release/17.x)
-    set(SPIRV_BASE_REVISION llvm_release_170)
-    set(TARGET_BRANCH "ocl-open-170")
+    set(CLANG_BASE_REVISION release/18.x)
+    set(SPIRV_BASE_REVISION llvm_release_180)
+    set(TARGET_BRANCH "ocl-open-180")
 
     apply_patches(${CLANG_SOURCE_DIR}
                   ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
@@ -264,42 +262,30 @@ if(USE_PREBUILT_LLVM OR CLANG_LINK_CLANG_DYLIB)
   list(APPEND OPENCL_CLANG_LINK_LIBS clang-cpp)
 else()
   list(APPEND OPENCL_CLANG_LINK_LIBS
-# The list of clang libraries is taken from clang makefile
-# (build/tools/clang/tools/driver/CMakeFiles/clang.dir/link.txt)
-# All duplicate libraries are there on purpose
     clangBasic
-    clangCodeGen
-    clangDriver
     clangFrontend
     clangFrontendTool
-    clangCodeGen
-    clangRewriteFrontend
-    clangARCMigrate
-    clangStaticAnalyzerFrontend
-    clangStaticAnalyzerCheckers
-    clangStaticAnalyzerCore
-    clangCrossTU
-    clangIndex
-    clangFrontend
-    clangDriver
-    clangParse
     clangSerialization
-    clangSema
-    clangAnalysis
-    clangEdit
-    clangFormat
-    clangToolingInclusions
-    clangToolingCore
-    clangRewrite
-    clangASTMatchers
-    clangAST
-    clangLex
-    clangBasic
   )
 endif()
 
+if(USE_PREBUILT_LLVM AND UNIX)
+  # llvm_map_components_to_libnames(... all) returns empty string if llvm is
+  # pre-built locally in either static or shared type in Ubuntu 22.04 container.
+  find_program(LLVM_CONFIG_EXE
+    NAMES llvm-config-${PREFERRED_LLVM_VERSION} llvm-config
+    PATHS ${LLVM_BINARY_DIR} ${LLVM_BINARY_DIR}/bin)
+  if(NOT LLVM_CONFIG_EXE)
+    message(FATAL_ERROR "[OPENCL-CLANG] llvm-config is not found")
+  endif()
+
+  execute_process(COMMAND ${LLVM_CONFIG_EXE} --libs all OUTPUT_VARIABLE ALL_LIBS)
+  string(REGEX REPLACE "( |\r|\n|-l)+" ";" ALL_LLVM_LIBS ${ALL_LIBS})
+  set(ALL_LLVM_LIBS "LLVMSPIRVLib${ALL_LLVM_LIBS}")
+else()
+  llvm_map_components_to_libnames(ALL_LLVM_LIBS all)
+endif()
 set(OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL "" CACHE STRING "Space-separated list of LLVM libraries to exclude from all")
-llvm_map_components_to_libnames(ALL_LLVM_LIBS all)
 if (NOT "${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL}" STREQUAL "")
   list(REMOVE_ITEM ALL_LLVM_LIBS ${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL})
 endif()
@@ -325,9 +311,12 @@ if (WIN32)
 elseif(UNIX)
     set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
         COMPILE_DEFINITIONS LIBOPENCL_CLANG_NAME="$<TARGET_SONAME_FILE_NAME:${TARGET_NAME}>")
-
-    set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
-        LINK_FLAGS " -Wl,--no-undefined")
+    
+    # Sanitizers do not support this flag, disable this when under sanitizer build
+    if(NOT LLVM_USE_SANITIZER)
+        set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
+            LINK_FLAGS " -Wl,--no-undefined")
+    endif()
 endif(WIN32)
 
 install(FILES opencl_clang.h

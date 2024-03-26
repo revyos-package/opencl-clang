@@ -35,8 +35,8 @@ Copyright (c) Intel Corporation (2009-2017).
   static constexpr llvm::StringLiteral NAME##_init[] = VALUE;                  \
   static constexpr llvm::ArrayRef<llvm::StringLiteral> NAME(                   \
       NAME##_init, std::size(NAME##_init) - 1);
-#define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
-               HELPTEXT, METAVAR, VALUES)
+#define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, VISIBILITY, \
+               PARAM, HELPTEXT, METAVAR, VALUES)
 #include "opencl_clang_options.inc"
 #undef OPTION
 #undef PREFIX
@@ -47,12 +47,12 @@ extern llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
 static constexpr OptTable::Info ClangOptionsInfoTable[] = {
 #define PREFIX(NAME, VALUE)
-#define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
-               HELPTEXT, METAVAR, VALUES)                                      \
+#define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, VISIBILITY, \
+               PARAM, HELPTEXT, METAVAR, VALUES)                               \
   {                                                                            \
     PREFIX, NAME, HELPTEXT, METAVAR, OPT_COMPILE_##ID,                         \
-        llvm::opt::Option::KIND##Class, PARAM, FLAGS, OPT_COMPILE_##GROUP,     \
-        OPT_COMPILE_##ALIAS, ALIASARGS, VALUES                                 \
+        llvm::opt::Option::KIND##Class, PARAM, FLAGS, VISIBILITY,              \
+        OPT_COMPILE_##GROUP, OPT_COMPILE_##ALIAS, ALIASARGS, VALUES            \
   }                                                                            \
   ,
 #include "opencl_clang_options.inc"
@@ -87,6 +87,7 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
     case OPT_COMPILE_cl_opt_disable:
     case OPT_COMPILE_cl_mad_enable:
     case OPT_COMPILE_cl_no_signed_zeros:
+    case OPT_COMPILE_cl_uniform_work_group_size:
     case OPT_COMPILE_cl_unsafe_math_optimizations:
       effectiveArgs.push_back((*it)->getAsString(args));
       break;
@@ -142,7 +143,6 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
     case OPT_COMPILE_triple:
       szTriple = (*it)->getValue();
       break;
-    case OPT_COMPILE_cl_uniform_work_group_size:
     case OPT_COMPILE_cl_no_subgroup_ifp:
     case OPT_COMPILE_target_triple:
     case OPT_COMPILE_spir_std_1_0:
@@ -161,6 +161,7 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
       // The below assert is usable for manual debugging only
       // default:
       // assert(false && "some unknown argument");
+    case OPT_COMPILE_coverage:
     case OPT_COMPILE_profiling:
     case OPT_COMPILE_gline_tables_only_Flag:
       effectiveArgs.push_back("-debug-info-kind=line-tables-only");
