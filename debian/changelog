@@ -1,8 +1,8 @@
-opencl-clang-17 (17.0.0-3) UNRELEASED; urgency=medium
+opencl-clang-17 (17.0.0-3) unstable; urgency=medium
 
   * Restrict watch file to 17.* releases.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 01 Mar 2024 09:00:59 +0100
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 28 Mar 2024 18:56:19 +0100
 
 opencl-clang-17 (17.0.0-2.1) unstable; urgency=medium
 
