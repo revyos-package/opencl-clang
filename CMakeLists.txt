@@ -1,5 +1,26 @@
-project( common_clang )
 cmake_minimum_required(VERSION 3.4.3)
+
+if(NOT DEFINED BASE_LLVM_VERSION)
+  set(BASE_LLVM_VERSION 14.0.0)
+endif(NOT DEFINED BASE_LLVM_VERSION)
+set(OPENCL_CLANG_VERSION ${BASE_LLVM_VERSION}.0)
+
+if(NOT DEFINED OPENCL_CLANG_BUILD_EXTERNAL)
+  # check if we build inside llvm or not
+  if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(OPENCL_CLANG_BUILD_EXTERNAL YES)
+  endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+endif(NOT DEFINED OPENCL_CLANG_BUILD_EXTERNAL)
+
+if(OPENCL_CLANG_BUILD_EXTERNAL)
+  project(OPENCL_CLANG
+    VERSION
+    ${OPENCL_CLANG_VERSION}
+    LANGUAGES
+      CXX
+      C
+  )
+endif()
 
 # Do not omit TARGET_OBJECTS expression from the SOURCES target
 # property
@@ -14,10 +35,14 @@ set(CMAKE_MODULE_PATH
 
 include(CMakeFunctions)
 
-if(LLVM_USE_HOST_TOOLS)
+if(LLVM_USE_HOST_TOOLS AND OPENCL_CLANG_BUILD_EXTERNAL)
   include(CrossCompile)
   llvm_create_cross_target(${PROJECT_NAME} NATIVE "" Release)
 endif()
+
+option(LLVMSPIRV_INCLUDED_IN_LLVM
+  "Set to ON if libLLVMSPIRVLib is linked into libLLVM" ON)
+option(APPLY_PATCHES "Apply local patches" ON)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(USE_PREBUILT_LLVM ON)
@@ -40,8 +65,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-    option(LLVMSPIRV_INCLUDED_IN_LLVM
-      "Set to ON if libLLVMSPIRVLib is linked into libLLVM" ON)
     if(LLVMSPIRV_INCLUDED_IN_LLVM)
         message(STATUS "[OPENCL-CLANG] Assuming that libLLVMSPIRVLib is linked into libLLVM")
     else(LLVMSPIRV_INCLUDED_IN_LLVM)
@@ -60,7 +83,7 @@ include(AddLLVM)
 include(TableGen)
 
 if (NOT WIN32)
-    add_subdirectory( linux_linker bin )
+    add_subdirectory( linux_linker bin)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -131,16 +154,20 @@ if(NOT USE_PREBUILT_LLVM)
     get_filename_component(LLVM_MONOREPO_DIR ${LLVM_SOURCE_DIR} DIRECTORY)
     set(LLVM_PATCHES_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/patches/llvm
                           ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang)
-    apply_patches(${LLVM_MONOREPO_DIR}
-                  "${LLVM_PATCHES_DIRS}"
-                  ${LLVM_BASE_REVISION}
-                  ${TARGET_BRANCH}
-                  ret)
-    apply_patches(${SPIRV_SOURCE_DIR}
-                  ${CMAKE_CURRENT_SOURCE_DIR}/patches/spirv
-                  ${SPIRV_BASE_REVISION}
-                  ${TARGET_BRANCH}
-                  ret)
+
+    if(APPLY_PATCHES)
+      message(STATUS "APPLY_PATCHES is enabled.")
+      apply_patches(${LLVM_MONOREPO_DIR}
+                    "${LLVM_PATCHES_DIRS}"
+                    ${LLVM_BASE_REVISION}
+                    ${TARGET_BRANCH})
+      apply_patches(${SPIRV_SOURCE_DIR}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/patches/spirv
+                    ${SPIRV_BASE_REVISION}
+                    ${TARGET_BRANCH})
+    else()
+      message(STATUS "APPLY_PATCHES is disabled, skip patch apply process.")
+    endif()
 endif(NOT USE_PREBUILT_LLVM)
 
 #
