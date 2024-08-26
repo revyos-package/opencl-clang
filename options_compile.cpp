@@ -20,6 +20,7 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "options.h"
 
 #include "clang/Driver/Options.h"
+#include "llvm/ADT/SmallSet.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
@@ -42,7 +43,7 @@ Copyright (c) Intel Corporation (2009-2017).
 
 using namespace llvm::opt;
 
-static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileOptionsMutex;
+extern llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
 static constexpr OptTable::Info ClangOptionsInfoTable[] = {
 #define PREFIX(NAME, VALUE)
@@ -70,6 +71,7 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
                                                    ArgsVector &effectiveArgs) {
   // Reset args
   int iCLStdSet = 0;
+  bool isCpp = false;
   bool fp64Enabled = false;
   std::string szTriple;
   std::string sourceName(llvm::Twine(s_progID++).str());
@@ -136,6 +138,17 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
       break;
     case OPT_COMPILE_cl_std_CL3_0:
       iCLStdSet = 300;
+      effectiveArgs.push_back((*it)->getAsString(args));
+      break;
+    case OPT_COMPILE_cl_std_CLCxx:
+    case OPT_COMPILE_cl_std_CLCxx1_0:
+      iCLStdSet = 200;
+      isCpp = true;
+      effectiveArgs.push_back((*it)->getAsString(args));
+      break;
+    case OPT_COMPILE_cl_std_CLCxx2021:
+      iCLStdSet = 300;
+      isCpp = true;
       effectiveArgs.push_back((*it)->getAsString(args));
       break;
     case OPT_COMPILE_triple:
@@ -219,7 +232,9 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
 
   // Specifying the option makes clang emit function body for functions
   // marked with inline keyword.
-  effectiveArgs.push_back("-fgnu89-inline");
+  if (!isCpp) {
+    effectiveArgs.push_back("-fgnu89-inline");
+  }
 
   // Do not support all extensions by default. Support for a particular
   // extension should be enabled by passing a '-cl-ext' option in pszOptionsEx.
@@ -306,11 +321,30 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
         it->second = enabled;
     }
   };
+  llvm::SmallSet<llvm::StringRef, 32> parsedOclCFeatures;
   std::for_each(effectiveArgs.begin(), effectiveArgs.end(),
                 [&](const ArgsVector::value_type &a) {
                   if (a.find("-cl-ext=") == 0)
                     parseClExt(a);
+		  else if (a.find("-D__opencl_c_") == 0)
+		    parsedOclCFeatures.insert(a);
                 });
+
+  // "opencl-c-base.h" unconditionally enables a list of so-called "optional
+  // core" language features. We need to undef those that aren't explicitly
+  // defined within the compilation command (which would suggest that the
+  // target platform supports the corresponding feature).
+  const char* optionalCoreOclCFeaturesList[] = {
+      "__opencl_c_work_group_collective_functions",
+      "__opencl_c_atomic_order_seq_cst",
+      "__opencl_c_atomic_scope_device",
+      "__opencl_c_atomic_scope_all_devices",
+      "__opencl_c_read_write_images" };
+  for (std::string OclCFeature : optionalCoreOclCFeaturesList) {
+    if (!parsedOclCFeatures.contains(std::string("-D") + OclCFeature))
+      effectiveArgs.push_back(std::string("-D__undef_") + OclCFeature);
+  }
+
   // extension is enabled in PCH but disabled or not specifed in options =>
   // disable pch
   bool useModules =
@@ -439,7 +473,7 @@ extern "C" CC_DLL_EXPORT bool CheckCompileOptions(const char *pszOptions,
                                                   size_t uiUnknownOptionsSize) {
   // LLVM doesn't guarantee thread safety,
   // therefore we serialize execution of LLVM code.
-  llvm::sys::SmartScopedLock<true> compileOptionsGuard {*compileOptionsMutex};
+  llvm::sys::SmartScopedLock<true> compileOptionsGuard{*compileMutex};
 
   try {
     CompileOptionsParser optionsParser("200");

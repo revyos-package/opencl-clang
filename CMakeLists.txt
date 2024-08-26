@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13.4)
 
 if(NOT DEFINED BASE_LLVM_VERSION)
-  set(BASE_LLVM_VERSION 16.0.0)
+  set(BASE_LLVM_VERSION 16)
 endif(NOT DEFINED BASE_LLVM_VERSION)
 set(OPENCL_CLANG_VERSION ${BASE_LLVM_VERSION}.0)
 
@@ -40,13 +40,17 @@ if(LLVM_USE_HOST_TOOLS AND OPENCL_CLANG_BUILD_EXTERNAL)
   llvm_create_cross_target(${PROJECT_NAME} NATIVE "" Release)
 endif()
 
+option(LLVMSPIRV_INCLUDED_IN_LLVM
+  "Set to ON if libLLVMSPIRVLib is linked into libLLVM" ON)
+option(APPLY_PATCHES "Apply local patches" ON)
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(USE_PREBUILT_LLVM ON)
 
     add_definitions(-DUSE_PREBUILT_LLVM)
 
     if(NOT PREFERRED_LLVM_VERSION)
-        set(PREFERRED_LLVM_VERSION "16.0.0")
+        set(PREFERRED_LLVM_VERSION "16")
     endif(NOT PREFERRED_LLVM_VERSION)
     message(STATUS "[OPENCL-CLANG] Looking for LLVM version ${PREFERRED_LLVM_VERSION}")
     find_package(LLVM ${PREFERRED_LLVM_VERSION} REQUIRED)
@@ -58,11 +62,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       ${CMAKE_MODULE_PATH}
       ${LLVM_CMAKE_DIR})
 
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-    option(LLVMSPIRV_INCLUDED_IN_LLVM
-      "Set to ON if libLLVMSPIRVLib is linked into libLLVM" ON)
     if(LLVMSPIRV_INCLUDED_IN_LLVM)
         message(STATUS "[OPENCL-CLANG] Assuming that libLLVMSPIRVLib is linked into libLLVM")
     else(LLVMSPIRV_INCLUDED_IN_LLVM)
@@ -153,18 +155,26 @@ if(NOT USE_PREBUILT_LLVM)
         )
     endif()
 
-    set(CLANG_BASE_REVISION release/16.x)
+    set(LLVM_BASE_REVISION release/16.x)
     set(SPIRV_BASE_REVISION llvm_release_160)
     set(TARGET_BRANCH "ocl-open-160")
+    get_filename_component(LLVM_MONOREPO_DIR ${LLVM_SOURCE_DIR} DIRECTORY)
+    set(LLVM_PATCHES_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/patches/llvm
+                          ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang)
 
-    apply_patches(${CLANG_SOURCE_DIR}
-                  ${CMAKE_CURRENT_SOURCE_DIR}/patches/clang
-                  ${CLANG_BASE_REVISION}
-                  ${TARGET_BRANCH})
-    apply_patches(${SPIRV_SOURCE_DIR}
-                  ${CMAKE_CURRENT_SOURCE_DIR}/patches/spirv
-                  ${SPIRV_BASE_REVISION}
-                  ${TARGET_BRANCH})
+    if(APPLY_PATCHES)
+      message(STATUS "APPLY_PATCHES is enabled.")
+      apply_patches(${LLVM_MONOREPO_DIR}
+                    "${LLVM_PATCHES_DIRS}"
+                    ${LLVM_BASE_REVISION}
+                    ${TARGET_BRANCH})
+      apply_patches(${SPIRV_SOURCE_DIR}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/patches/spirv
+                    ${SPIRV_BASE_REVISION}
+                    ${TARGET_BRANCH})
+    else()
+      message(STATUS "APPLY_PATCHES is disabled, skip patch apply process.")
+    endif()
 endif(NOT USE_PREBUILT_LLVM)
 
 #
@@ -292,21 +302,38 @@ else()
   )
 endif()
 
-add_library(${TARGET_NAME} SHARED
-    ${TARGET_INCLUDE_FILES}
-    ${TARGET_SOURCE_FILES}
-    $<TARGET_OBJECTS:cl_headers>
-)
+if(USE_PREBUILT_LLVM AND UNIX)
+  # llvm_map_components_to_libnames(... all) returns empty string if llvm is
+  # pre-built locally in either static or shared type in Ubuntu 22.04 container.
+  find_program(LLVM_CONFIG_EXE
+    NAMES llvm-config-${PREFERRED_LLVM_VERSION} llvm-config
+    PATHS ${LLVM_BINARY_DIR} ${LLVM_BINARY_DIR}/bin)
+  if(NOT LLVM_CONFIG_EXE)
+    message(FATAL_ERROR "[OPENCL-CLANG] llvm-config is not found")
+  endif()
 
-# Same CRT compile option are reqiured to avoid link errors on Windows.
-# MD and MDd are choosed by default for release and debug build in LLVM.
-# If users set MT or MTd flags, they also need to add the flags for
-# opencl-clang sources using a custom macro set_msvc_crt_flags.
-if(COMMAND set_msvc_crt_flags)
-    set_msvc_crt_flags(${TARGET_NAME})
+  execute_process(COMMAND ${LLVM_CONFIG_EXE} --libs all OUTPUT_VARIABLE ALL_LIBS)
+  string(REGEX REPLACE "( |\r|\n|-l)+" ";" ALL_LLVM_LIBS ${ALL_LIBS})
+  set(ALL_LLVM_LIBS "LLVMSPIRVLib${ALL_LLVM_LIBS}")
+else()
+  llvm_map_components_to_libnames(ALL_LLVM_LIBS all)
 endif()
+set(OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL "" CACHE STRING "Space-separated list of LLVM libraries to exclude from all")
+if (NOT "${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL}" STREQUAL "")
+  list(REMOVE_ITEM ALL_LLVM_LIBS ${OPENCL_CLANG_EXCLUDE_LIBS_FROM_ALL})
+endif()
+list(APPEND OPENCL_CLANG_LINK_LIBS ${ALL_LLVM_LIBS})
 
-add_dependencies(${TARGET_NAME} CClangCompileOptions)
+add_llvm_library(${TARGET_NAME} SHARED
+  ${TARGET_INCLUDE_FILES}
+  ${TARGET_SOURCE_FILES}
+  $<TARGET_OBJECTS:cl_headers>
+
+  DEPENDS CClangCompileOptions
+
+  LINK_LIBS
+    ${OPENCL_CLANG_LINK_LIBS}
+  )
 
 if (WIN32)
     # Enable compiler generation of Control Flow Guard security checks.
@@ -321,51 +348,6 @@ elseif(UNIX)
     set_property(TARGET ${TARGET_NAME} APPEND_STRING PROPERTY
         LINK_FLAGS " -Wl,--no-undefined")
 endif(WIN32)
-
-# Enable new IN_LIST operator.
-cmake_policy(SET CMP0057 NEW)
-set(OTHER_LIBRARIES)
-if ("NVPTX" IN_LIST LLVM_TARGETS_TO_BUILD)
-    list(APPEND OTHER_LIBRARIES LLVMNVPTXCodeGen LLVMNVPTXDesc LLVMNVPTXInfo)
-endif()
-if ("AMDGPU" IN_LIST LLVM_TARGETS_TO_BUILD)
-    list(APPEND OTHER_LIBRARIES LLVMAMDGPUCodeGen LLVMAMDGPUAsmParser LLVMAMDGPUDesc LLVMAMDGPUInfo)
-endif()
-
-target_link_libraries( ${TARGET_NAME}
-                       LINK_PRIVATE
-                       ${OPENCL_CLANG_LINK_LIBS}
-                       LLVMX86CodeGen
-                       LLVMX86AsmParser
-                       LLVMX86Desc
-                       LLVMX86Info
-                       LLVMX86Disassembler
-                       LLVMAnalysis
-                       LLVMCodeGen
-                       LLVMCore
-                       LLVMipo
-                       LLVMInstCombine
-                       LLVMInstrumentation
-                       LLVMMC
-                       LLVMMCParser
-                       LLVMObjCARCOpts
-                       LLVMOption
-                       LLVMScalarOpts
-                       LLVMSupport
-                       LLVMTransformUtils
-                       LLVMVectorize
-                       LLVMAsmPrinter
-                       LLVMSelectionDAG
-                       LLVMMCDisassembler
-                       LLVMProfileData
-                       LLVMObject
-                       LLVMBitWriter
-                       LLVMIRReader
-                       LLVMAsmParser
-                       LLVMTarget
-                       LLVMBitReader
-                       ${OTHER_LIBRARIES}
-                      )
 
 install(FILES opencl_clang.h
         DESTINATION include/cclang
