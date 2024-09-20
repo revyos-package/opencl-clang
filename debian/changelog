@@ -1,9 +1,9 @@
-opencl-clang-18 (18.1.0-2) UNRELEASED; urgency=medium
+opencl-clang-18 (18.1.0-2) unstable; urgency=medium
 
   * Restrict watch file to 18.* releases.
   * Bump Standards-Version to 4.7.0.
 
- -- Andreas Beckmann <anbe@debian.org>  Fri, 20 Sep 2024 23:39:14 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 21 Sep 2024 00:45:33 +0200
 
 opencl-clang-18 (18.1.0-1) unstable; urgency=medium
 
