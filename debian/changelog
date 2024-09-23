@@ -3,6 +3,7 @@ opencl-clang-19 (19.1.0-1) UNRELEASED; urgency=medium
   * New upstream release.
   * Fork source package as opencl-clang-19.
   * Rename binary packages: *18* => *19*.
+  * Build with llvm 19.
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 23 Sep 2024 14:55:03 +0200
 
