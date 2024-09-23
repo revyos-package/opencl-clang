@@ -1,0 +1,98 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "ocl-open-190" ]
+  pull_request:
+    branches: [ "ocl-open-190" ]
+
+permissions:
+  contents: read
+
+env:
+  LLVM_VERSION: 19
+  LLVM_VERSION_MINOR: 1
+
+jobs:
+  analyze:
+    name: Analyze
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      # required for all workflows
+      security-events: write
+
+      # required to fetch internal or private CodeQL packs
+      packages: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - language: c-cpp
+          build-mode: manual
+
+    steps:
+
+      - name: Install llvm and its dependencies
+        run: |
+          curl -L "https://apt.llvm.org/llvm-snapshot.gpg.key" | sudo apt-key add -
+          curl -L "https://packages.lunarg.com/lunarg-signing-key-pub.asc" | sudo apt-key add -
+          echo "deb https://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main" | sudo tee -a /etc/apt/sources.list
+          echo "deb https://packages.lunarg.com/vulkan jammy main" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install \
+            clang-${{ env.LLVM_VERSION }} \
+            clang-tools-${{ env.LLVM_VERSION }} \
+            llvm-${{ env.LLVM_VERSION }}-dev \
+            libclang-${{ env.LLVM_VERSION }}-dev \
+            libclang-cpp${{ env.LLVM_VERSION }}-dev \
+            libllvmlibc-${{ env.LLVM_VERSION }}-dev \
+            libpolly-${{ env.LLVM_VERSION }}-dev \
+            mlir-19-tools
+
+      - name: Checkout opencl-clang sources for action files
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Checkout SPIRV-LLVM-Translator sources
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          repository: KhronosGroup/SPIRV-LLVM-Translator
+          path: SPIRV-LLVM-Translator
+          ref: llvm_release_190
+
+      - name: Build SPIRV-LLVM-Translator
+        run: |
+          builddir=${{ github.workspace }}/SPIRV-LLVM-Translator/build
+          cmake -B "$builddir" \
+            ${{ github.workspace }}/SPIRV-LLVM-Translator \
+            -DLLVM_INCLUDE_TESTS=OFF \
+            -DCMAKE_INSTALL_PREFIX="$builddir"/install \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$builddir" -j $(nproc)
+          cmake --install "$builddir"
+          echo "spirv-translator-dir=${builddir}/install" >> $GITHUB_ENV
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@f079b8493333aace61c81488f8bd40919487bd9f # v3.25.7
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Build opencl-clang
+        run: |
+          mkdir build && cd build
+          cmake ${{ github.workspace }} \
+            -DPREFERRED_LLVM_VERSION="${{ env.LLVM_VERSION }}.${{ env.LLVM_VERSION_MINOR }}" \
+            -DLLVMSPIRV_INCLUDED_IN_LLVM=OFF \
+            -DSPIRV_TRANSLATOR_DIR=${{ env.spirv-translator-dir }} \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j $(nproc)
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@f079b8493333aace61c81488f8bd40919487bd9f # v3.25.7
+        with:
+          category: "/language:${{matrix.language}}"

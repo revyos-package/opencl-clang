@@ -1,0 +1,43 @@
+# ===---
+# Running on push & pull_request.
+#   This workflow parses the destination branch
+#   to choose correct dependencies revisions
+# ===---
+
+name: In-tree build
+run-name: '${{ github.event_name }}: ${{ github.base_ref }} ${{ github.ref_name }}' # github.base_ref null for 'on: push'
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - ocl-open-190
+  pull_request:
+    branches:
+      - ocl-open-190
+    types:
+      - opened
+      - reopened
+      - synchronize       # commit pushed to the PR
+      - ready_for_review  # moved from draft state
+
+jobs:
+
+  verify_default_branch:
+    name: Linux
+    # ref_name for 'on: push'
+    # base_ref for 'on: pull_request'
+    runs-on: ubuntu-22.04
+    steps:
+
+      - name: Checkout opencl-clang sources for action files
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Run build-opencl-clang action
+        uses: ./.github/actions/build-opencl-clang
+        with:
+          ref_llvm: main
+          ref_translator: main
+          ref_opencl-clang: ${{ github.ref }}

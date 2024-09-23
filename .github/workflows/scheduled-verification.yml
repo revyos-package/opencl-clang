@@ -5,6 +5,9 @@
 name: Scheduled verification
 run-name: Scheduled verification
 
+permissions:
+  contents: read
+
 on:
   schedule:
     # Run Sunday & Wednesday at 00:00
@@ -18,7 +21,7 @@ jobs:
     steps:
 
       - name: Checkout opencl-clang sources for action files availabilty
-        uses: actions/checkout@v3
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Run build-opencl-clang action
         uses: ./.github/actions/build-opencl-clang
@@ -28,15 +31,15 @@ jobs:
           ref_opencl-clang: main
 
   verify-release-branches:
-    name: Verify `ocl-open-*` release branches
+    name: Verify `ocl-open-${{ matrix.llvm_version }}` release branch
     strategy:
       matrix:
-        llvm_version: [ 10, 11, 12, 13, 14, 15 ]
+        llvm_version: [ 14, 15, 16, 17, 18 ]
     runs-on: ubuntu-22.04
     steps:
 
       - name: Checkout opencl-clang sources for action files availabilty
-        uses: actions/checkout@v3
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Run build-opencl-clang action
         uses: ./.github/actions/build-opencl-clang
