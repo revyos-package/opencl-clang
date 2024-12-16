@@ -85,7 +85,7 @@ static volatile bool lazyCCInit =
     true; // the flag must be 'volatile' to prevent caching in a CPU register
 static llvm::sys::Mutex lazyCCInitMutex;
 
-static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileMutex;
+llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
 void CommonClangTerminate() { llvm::llvm_shutdown(); }
 
@@ -113,17 +113,30 @@ void CommonClangInitialize() {
 }
 
 static bool GetHeaders(std::vector<Resource> &Result) {
-  struct {const char *ID; const char *Name;} Headers[] = {
-    {OPENCL_C_H,             "opencl-c.h"},
-    {OPENCL_C_BASE_H,        "opencl-c-base.h"},
-  };
+  struct {
+    const char *ID;
+    const char *Name;
+  } Headers[] = {{OPENCL_C_H, "opencl-c.h"},
+                 {OPENCL_C_BASE_H, "opencl-c-base.h"},
+                 {OPENCL_C_12_SPIR_PCM, "opencl-c-12-spir.pcm"},
+                 {OPENCL_C_20_SPIR_PCM, "opencl-c-20-spir.pcm"},
+                 {OPENCL_C_30_SPIR_PCM, "opencl-c-30-spir.pcm"},
+                 {OPENCL_C_12_SPIR64_PCM, "opencl-c-12-spir64.pcm"},
+                 {OPENCL_C_20_SPIR64_PCM, "opencl-c-20-spir64.pcm"},
+                 {OPENCL_C_30_SPIR64_PCM, "opencl-c-30-spir64.pcm"},
+                 {OPENCL_C_12_SPIR_FP64_PCM, "opencl-c-12-spir-fp64.pcm"},
+                 {OPENCL_C_20_SPIR_FP64_PCM, "opencl-c-20-spir-fp64.pcm"},
+                 {OPENCL_C_30_SPIR_FP64_PCM, "opencl-c-30-spir-fp64.pcm"},
+                 {OPENCL_C_12_SPIR64_FP64_PCM, "opencl-c-12-spir64-fp64.pcm"},
+                 {OPENCL_C_20_SPIR64_FP64_PCM, "opencl-c-20-spir64-fp64.pcm"},
+                 {OPENCL_C_30_SPIR64_FP64_PCM, "opencl-c-30-spir64-fp64.pcm"},
+                 {OPENCL_C_MODULE_MAP, "module.modulemap"}};
 
   Result.clear();
   Result.reserve(sizeof(Headers) / sizeof(*Headers));
 
   ResourceManager &RM = ResourceManager::instance();
-
-  for (auto Header:Headers) {
+  for (auto Header : Headers) {
     Resource R = RM.get_resource(Header.Name, Header.ID, "PCM", true);
     if (!R) {
       assert(0 && "Resource not found");
@@ -199,6 +212,9 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
   CommonClangInitialize();
 
   try {
+#ifdef _WIN32
+    llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
     std::unique_ptr<OCLFEBinaryResult> pResult(new OCLFEBinaryResult());
 
     // Create the clang compiler
@@ -210,8 +226,9 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
     // Prepare error log
     llvm::raw_string_ostream err_ostream(pResult->getLogRef());
     {
-      llvm::sys::SmartScopedLock<true> compileGuard {*compileMutex};
-
+#ifndef _WIN32
+      llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
       // Parse options
       optionsParser.processOptions(pszOptions, pszOptionsEx);
 
@@ -244,9 +261,6 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
       compiler->createFileManager(OverlayFS);
       compiler->createSourceManager(compiler->getFileManager());
 
-      // Calling ResetAllOptionOccurrences as WA for issue from here:
-      // https://reviews.llvm.org/D66324?id=219733#1680231
-      llvm::cl::ResetAllOptionOccurrences();
       // Create compiler invocation from user args before trickering with it
       clang::CompilerInvocation::CreateFromArgs(compiler->getInvocation(),
           optionsParser.args(), *Diags);
@@ -327,12 +341,15 @@ Compile(const char *pszProgramSource, const char **pInputHeaders,
       if (!optionsParser.hasOptDisable()) {
         SPIRVOpts.setMemToRegEnabled(true);
       }
+      SPIRVOpts.setPreserveOCLKernelArgTypeMetadataThroughString(true);
       success = llvm::writeSpirv(M.get(), SPIRVOpts, OS, Err);
       err_ostream << Err.c_str();
       err_ostream.flush();
     }
     {
-      llvm::sys::SmartScopedLock<true> compileGuard {*compileMutex};
+#ifndef _WIN32
+      llvm::sys::SmartScopedLock<true> compileGuard{*compileMutex};
+#endif
       if (pBinaryResult) {
         *pBinaryResult = pResult.release();
       }
