@@ -1,6 +1,7 @@
 opencl-clang-14 (14.0.1-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Bump Standards-Version to 4.7.0.
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 16 Dec 2024 05:30:31 +0100
 
