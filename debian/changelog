@@ -1,3 +1,9 @@
+opencl-clang-14 (14.0.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 16 Dec 2024 05:30:31 +0100
+
 opencl-clang-14 (14.0.0-4) unstable; urgency=medium
 
   * Restrict watch file to 14.* releases.
