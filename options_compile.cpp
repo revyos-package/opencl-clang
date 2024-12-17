@@ -20,11 +20,14 @@ Copyright (c) Intel Corporation (2009-2017).
 #include "options.h"
 
 #include "clang/Driver/Options.h"
+#include "llvm/ADT/SmallSet.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Mutex.h"
 
+#include <algorithm>
+#include <map>
 #include <sstream>
 
 #define PREFIX(NAME, VALUE) const char *const NAME[] = VALUE;
@@ -36,7 +39,7 @@ Copyright (c) Intel Corporation (2009-2017).
 
 using namespace llvm::opt;
 
-static llvm::ManagedStatic<llvm::sys::SmartMutex<true> > compileOptionsMutex;
+extern llvm::ManagedStatic<llvm::sys::SmartMutex<true>> compileMutex;
 
 static const OptTable::Info ClangOptionsInfoTable[] = {
 #define PREFIX(NAME, VALUE)
@@ -64,6 +67,8 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
                                                    ArgsVector &effectiveArgs) {
   // Reset args
   int iCLStdSet = 0;
+  bool isCpp = false;
+  bool fp64Enabled = false;
   std::string szTriple;
   std::string sourceName(llvm::Twine(s_progID++).str());
 
@@ -129,6 +134,17 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
       break;
     case OPT_COMPILE_cl_std_CL3_0:
       iCLStdSet = 300;
+      effectiveArgs.push_back((*it)->getAsString(args));
+      break;
+    case OPT_COMPILE_cl_std_CLCxx:
+    case OPT_COMPILE_cl_std_CLCxx1_0:
+      iCLStdSet = 200;
+      isCpp = true;
+      effectiveArgs.push_back((*it)->getAsString(args));
+      break;
+    case OPT_COMPILE_cl_std_CLCxx2021:
+      iCLStdSet = 300;
+      isCpp = true;
       effectiveArgs.push_back((*it)->getAsString(args));
       break;
     case OPT_COMPILE_triple:
@@ -208,7 +224,9 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
 
   // Specifying the option makes clang emit function body for functions
   // marked with inline keyword.
-  effectiveArgs.push_back("-fgnu89-inline");
+  if (!isCpp) {
+    effectiveArgs.push_back("-fgnu89-inline");
+  }
 
   // Do not support all extensions by default. Support for a particular
   // extension should be enabled by passing a '-cl-ext' option in pszOptionsEx.
@@ -224,6 +242,122 @@ std::string EffectiveOptionsFilter::processOptions(const OpenCLArgList &args,
   // add the extended options verbatim
   std::back_insert_iterator<ArgsVector> it(std::back_inserter(effectiveArgs));
   quoted_tokenize(it, pszOptionsEx, " \t", '"', '\x00');
+
+  for (auto it = effectiveArgs.begin(), end = effectiveArgs.end(); it != end;
+       ++it) {
+    if (it->compare("-Dcl_khr_fp64") == 0)
+      fp64Enabled = true;
+  }
+
+  std::map<std::string, bool> extMap{
+      {"cl_khr_3d_image_writes", true},
+      {"cl_khr_depth_images", true},
+      {"cl_khr_fp16", true},
+#ifdef _WIN32
+      // cl_khr_gl_msaa_sharing is only supported on Windows [NEO].
+      {"cl_khr_gl_msaa_sharing", true},
+#endif
+      {"cl_khr_global_int32_base_atomics", true},
+      {"cl_khr_global_int32_extended_atomics", true},
+      {"cl_khr_int64_base_atomics", true},
+      {"cl_khr_int64_extended_atomics", true},
+      {"cl_khr_local_int32_base_atomics", true},
+      {"cl_khr_local_int32_extended_atomics", true},
+      {"cl_khr_mipmap_image", true},
+      {"cl_khr_mipmap_image_writes", true},
+      {"cl_khr_subgroups", true},
+      {"cl_intel_device_side_avc_motion_estimation", true},
+      {"cl_intel_planar_yuv", true},
+      {"cl_intel_subgroups", true},
+      {"cl_intel_subgroups_short", true}};
+
+  auto parseClExt = [&](const std::string &clExtStr) {
+    llvm::StringRef clExtRef(clExtStr);
+    clExtRef.consume_front("-cl-ext=");
+    llvm::SmallVector<llvm::StringRef, 32> parsedExt;
+    clExtRef.split(parsedExt, ',');
+    for (auto ext : parsedExt) {
+      char sign = ext.front();
+      bool enabled = sign != '-';
+      llvm::StringRef extName = ext;
+      if (sign == '+' || sign == '-')
+        extName = extName.drop_front();
+      if (extName == "all") {
+        for (auto &p : extMap)
+          p.second = enabled;
+        continue;
+      }
+      auto it = extMap.find(extName.str());
+      if (it != extMap.end())
+        it->second = enabled;
+    }
+  };
+  llvm::SmallSet<llvm::StringRef, 32> parsedOclCFeatures;
+  std::for_each(effectiveArgs.begin(), effectiveArgs.end(),
+                [&](const ArgsVector::value_type &a) {
+                  if (a.find("-cl-ext=") == 0)
+                    parseClExt(a);
+		  else if (a.find("-D__opencl_c_") == 0)
+		    parsedOclCFeatures.insert(a);
+                });
+
+  // "opencl-c-base.h" unconditionally enables a list of so-called "optional
+  // core" language features. We need to undef those that aren't explicitly
+  // defined within the compilation command (which would suggest that the
+  // target platform supports the corresponding feature).
+  const char* optionalCoreOclCFeaturesList[] = {
+      "__opencl_c_work_group_collective_functions",
+      "__opencl_c_atomic_order_seq_cst",
+      "__opencl_c_atomic_scope_device",
+      "__opencl_c_atomic_scope_all_devices",
+      "__opencl_c_read_write_images" };
+  for (std::string OclCFeature : optionalCoreOclCFeaturesList) {
+    if (!parsedOclCFeatures.contains(std::string("-D") + OclCFeature))
+      effectiveArgs.push_back(std::string("-D__undef_") + OclCFeature);
+  }
+
+  // extension is enabled in PCH but disabled or not specifed in options =>
+  // disable pch
+  bool useModules =
+      !std::any_of(extMap.begin(), extMap.end(),
+                   [](const auto &p) { return p.second == false; });
+
+  if (useModules) {
+    effectiveArgs.push_back("-fmodules");
+    if (!fp64Enabled) {
+      if (szTriple.find("spir64") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir64.pcm");
+      } else if (szTriple.find("spir") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir.pcm");
+      }
+    } else {
+      if (szTriple.find("spir64") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir64-fp64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir64-fp64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir64-fp64.pcm");
+      } else if (szTriple.find("spir") != szTriple.npos) {
+        if (iCLStdSet <= 120)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-12-spir-fp64.pcm");
+        else if (iCLStdSet == 200)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-20-spir-fp64.pcm");
+        else if (iCLStdSet == 300)
+          effectiveArgs.push_back("-fmodule-file=opencl-c-30-spir-fp64.pcm");
+      }
+    }
+  }
 
   // add source name to options as an input file
   assert(!sourceName.empty() && "Empty source name.");
@@ -310,7 +444,7 @@ extern "C" CC_DLL_EXPORT bool CheckCompileOptions(const char *pszOptions,
                                                   size_t uiUnknownOptionsSize) {
   // LLVM doesn't guarantee thread safety,
   // therefore we serialize execution of LLVM code.
-  llvm::sys::SmartScopedLock<true> compileOptionsGuard {*compileOptionsMutex};
+  llvm::sys::SmartScopedLock<true> compileOptionsGuard{*compileMutex};
 
   try {
     CompileOptionsParser optionsParser("200");
