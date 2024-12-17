@@ -1,8 +1,9 @@
-opencl-clang-15 (15.0.0-4) UNRELEASED; urgency=medium
+opencl-clang-15 (15.0.1-1) UNRELEASED; urgency=medium
 
+  * New upstream release.
   * Merge changes from opencl-clang-14 14.0.1-1.
 
- -- Andreas Beckmann <anbe@debian.org>  Tue, 17 Dec 2024 03:49:29 +0100
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 17 Dec 2024 12:10:48 +0100
 
 opencl-clang-15 (15.0.0-3) unstable; urgency=medium
 
