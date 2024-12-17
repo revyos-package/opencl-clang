@@ -1,3 +1,9 @@
+opencl-clang-15 (15.0.0-4) UNRELEASED; urgency=medium
+
+  * Merge changes from opencl-clang-14 14.0.1-1.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 17 Dec 2024 03:49:29 +0100
+
 opencl-clang-15 (15.0.0-3) unstable; urgency=medium
 
   * Restrict watch file to 15.* releases.
@@ -18,6 +24,14 @@ opencl-clang-15 (15.0.0-1) unstable; urgency=medium
   * Build with llvm 15.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 04 Oct 2022 10:17:02 +0200
+
+opencl-clang-14 (14.0.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update .symbols control file.
+  * Bump Standards-Version to 4.7.0.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 17 Dec 2024 01:02:54 +0100
 
 opencl-clang-14 (14.0.0-4) unstable; urgency=medium
 
