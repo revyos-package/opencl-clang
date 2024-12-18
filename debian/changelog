@@ -1,9 +1,9 @@
-opencl-clang-18 (18.1.1-1) UNRELEASED; urgency=medium
+opencl-clang-18 (18.1.1-1) unstable; urgency=medium
 
   * New upstream release.
   * Merge changes from opencl-clang-17 17.0.1-1.
 
- -- Andreas Beckmann <anbe@debian.org>  Wed, 18 Dec 2024 00:46:08 +0100
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 18 Dec 2024 09:30:56 +0100
 
 opencl-clang-18 (18.1.0-2) unstable; urgency=medium
 
