@@ -2,6 +2,7 @@ opencl-clang-19 (19.1.0-2) UNRELEASED; urgency=medium
 
   * Merge changes from opencl-clang-18 18.1.1-1.
   * Restrict watch file to 19.* releases.
+  * Bump Standards-Version to 4.7.2.
 
  -- Andreas Beckmann <anbe@debian.org>  Wed, 18 Dec 2024 09:38:05 +0100
 
