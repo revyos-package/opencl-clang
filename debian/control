@@ -1,4 +1,4 @@
-Source: opencl-clang-19
+Source: opencl-clang-20
 Section: libdevel
 Priority: optional
 Maintainer: Debian OpenCL team <pkg-opencl-devel@lists.alioth.debian.org>
@@ -20,7 +20,7 @@ Rules-Requires-Root: no
 Standards-Version: 4.7.2
 Homepage: https://github.com/intel/opencl-clang
 Vcs-Browser: https://salsa.debian.org/opencl-team/opencl-clang
-Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm19/main
+Vcs-Git: https://salsa.debian.org/opencl-team/opencl-clang.git -b llvm20/main
 
 Package: libopencl-clang19.1
 Architecture: any
