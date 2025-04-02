@@ -1,9 +1,10 @@
-opencl-clang-20 (19.1.0-3) UNRELEASED; urgency=medium
+opencl-clang-20 (20.~~+git20250114-1) UNRELEASED; urgency=medium
 
+  * New upstream snapshot.
   * Fork source package as opencl-clang-20.
   * Rename binary packages: *19* => *20*.
 
- -- Andreas Beckmann <anbe@debian.org>  Wed, 02 Apr 2025 22:45:13 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 02 Apr 2025 22:56:35 +0200
 
 opencl-clang-19 (19.1.0-2) unstable; urgency=medium
 
