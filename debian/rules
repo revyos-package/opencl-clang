@@ -12,6 +12,7 @@ LLVM_UPSTREAM_VERSION	 = $(shell dpkg-query -f '$${source:Upstream-Version}\n' -
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+		-DPREFERRED_LLVM_VERSION=$(LLVM_UPSTREAM_VERSION) \
 		-DLLVMSPIRV_INCLUDED_IN_LLVM=OFF \
 		-DSPIRV_TRANSLATOR_DIR=/usr/lib \
 		-DCMAKE_SKIP_RPATH=true \

@@ -1,4 +1,4 @@
-libopencl-clang.so.19.1 #PACKAGE# #MINVER#
+libopencl-clang.so.20.1 #PACKAGE# #MINVER#
 * Build-Depends-Package: libopencl-clang-20-dev
  CheckCompileOptions@Base 0
  Compile@Base 0

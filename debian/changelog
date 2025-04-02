@@ -3,6 +3,7 @@ opencl-clang-20 (20.~~+git20250114-1) UNRELEASED; urgency=medium
   * New upstream snapshot.
   * Fork source package as opencl-clang-20.
   * Rename binary packages: *19* => *20*.
+  * Build with llvm 20.
 
  -- Andreas Beckmann <anbe@debian.org>  Wed, 02 Apr 2025 22:56:35 +0200
 
