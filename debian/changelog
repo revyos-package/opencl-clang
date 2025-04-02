@@ -1,6 +1,7 @@
 opencl-clang-20 (19.1.0-3) UNRELEASED; urgency=medium
 
   * Fork source package as opencl-clang-20.
+  * Rename binary packages: *19* => *20*.
 
  -- Andreas Beckmann <anbe@debian.org>  Wed, 02 Apr 2025 22:45:13 +0200
 
