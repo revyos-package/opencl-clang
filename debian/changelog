@@ -1,8 +1,8 @@
-opencl-clang-20 (20.1.0-1) UNRELEASED; urgency=medium
+opencl-clang-20 (20.1.0-1) experimental; urgency=medium
 
   * New upstream release.
 
- -- Andreas Beckmann <anbe@debian.org>  Mon, 19 May 2025 23:31:08 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 20 May 2025 00:37:31 +0200
 
 opencl-clang-20 (20.~~+git20250114-1) experimental; urgency=medium
 
