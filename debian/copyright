@@ -4,7 +4,7 @@ Source: https://github.com/intel/opencl-clang
 
 Files: *
 Copyright:
- (c) 2009-2017 Intel Corporation
+ (c) 2009-2018 Intel Corporation
 License: BSD-3-clause
 
 Files: debian/*
