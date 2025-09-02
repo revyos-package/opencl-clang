@@ -1,0 +1,24 @@
+From 25f12dacfd56618b9612cbbe405305ea03fff3cc Mon Sep 17 00:00:00 2001
+From: Wenju He <wenju.he@intel.com>
+Date: Thu, 28 Aug 2025 13:25:03 +0800
+Subject: [PATCH] Upgrade cmake_minimum_required to align with LLVM
+ release/15.x (#573)
+
+Fix error `Compatibility with CMake < 3.5 has been removed from CMake.`
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e01902b..ba2cd1b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.4.3)
++cmake_minimum_required(VERSION 3.13.4)
+ 
+ if(NOT DEFINED BASE_LLVM_VERSION)
+   set(BASE_LLVM_VERSION 14.0.0)
+-- 
+2.39.5
+
