@@ -1,3 +1,9 @@
+opencl-clang-16 (16.0.4-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 03 Sep 2025 11:47:15 +0200
+
 opencl-clang-16 (16.0.3-1) UNRELEASED; urgency=medium
 
   * New upstream release.
