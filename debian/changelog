@@ -74,6 +74,20 @@ opencl-clang-17 (17.0.0-1) experimental; urgency=medium
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 30 Oct 2023 14:25:29 +0100
 
+opencl-clang-16 (16.0.4-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * Merge changes from opencl-clang-15 15.0.3-1.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 03 Sep 2025 11:47:15 +0200
+
+opencl-clang-16 (16.0.3-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * Merge changes from opencl-clang-15 15.0.2-1.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 12 Aug 2025 09:27:05 +0200
+
 opencl-clang-16 (16.0.1-1) UNRELEASED; urgency=medium
 
   * New upstream release.
@@ -112,6 +126,20 @@ opencl-clang-16 (16.0.0-1) experimental; urgency=medium
 
  -- Andreas Beckmann <anbe@debian.org>  Mon, 24 Apr 2023 15:46:58 +0200
 
+opencl-clang-15 (15.0.3-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * Merge changes from opencl-clang-14 14.0.2-2.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 02 Sep 2025 23:41:19 +0200
+
+opencl-clang-15 (15.0.2-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * Merge changes from opencl-clang-14 14.0.2-1.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 12 Aug 2025 09:16:36 +0200
+
 opencl-clang-15 (15.0.1-1) UNRELEASED; urgency=medium
 
   * New upstream release.
@@ -139,6 +167,19 @@ opencl-clang-15 (15.0.0-1) unstable; urgency=medium
   * Build with llvm 15.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 04 Oct 2022 10:17:02 +0200
+
+opencl-clang-14 (14.0.2-2) unstable; urgency=medium
+
+  * Fix building with CMake 4.  (Closes: #1113353)
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 02 Sep 2025 23:30:16 +0200
+
+opencl-clang-14 (14.0.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bump Standards-Version to 4.7.2.
+
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 11 Aug 2025 14:10:32 +0200
 
 opencl-clang-14 (14.0.1-1) unstable; urgency=medium
 
