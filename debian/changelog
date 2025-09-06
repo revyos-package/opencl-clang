@@ -1,7 +1,8 @@
 opencl-clang-15 (15.0.3-1) UNRELEASED; urgency=medium
 
   * New upstream release.
-  * Merge changes from opencl-clang-14 14.0.2-2.
+  * Merge changes from opencl-clang-14 14.0.2-3.
+  * Build with g++-14.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 02 Sep 2025 23:41:19 +0200
 
@@ -39,6 +40,12 @@ opencl-clang-15 (15.0.0-1) unstable; urgency=medium
   * Build with llvm 15.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 04 Oct 2022 10:17:02 +0200
+
+opencl-clang-14 (14.0.2-3) unstable; urgency=medium
+
+  * Build with g++-14.  (Closes: #1114244)
+
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 06 Sep 2025 08:45:50 +0200
 
 opencl-clang-14 (14.0.2-2) unstable; urgency=medium
 
