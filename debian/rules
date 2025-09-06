@@ -9,7 +9,7 @@ LLVM_VERSION		 = $(shell sed -n -r '/^Build/,/^$$/s/.*llvm-([0-9]+)-dev.*/\1/p' 
 LLVM_UPSTREAM_VERSION	 = $(shell dpkg-query -f '$${source:Upstream-Version}\n' -W llvm-$(LLVM_VERSION)-dev)
 
 %:
-	dh $@ --builddir build/
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
