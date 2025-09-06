@@ -6,6 +6,7 @@ Uploaders:
  Timo Aaltonen <tjaalton@debian.org>,
  Andreas Beckmann <anbe@debian.org>,
 Build-Depends: debhelper-compat (= 13),
+ g++-14,
  clang-14,
  cmake,
  libclang-14-dev,

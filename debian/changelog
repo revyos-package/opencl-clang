@@ -1,3 +1,9 @@
+opencl-clang-14 (14.0.2-3) UNRELEASED; urgency=medium
+
+  * Build with g++-14.  (Closes: #1114244)
+
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 06 Sep 2025 08:26:10 +0200
+
 opencl-clang-14 (14.0.2-2) unstable; urgency=medium
 
   * Fix building with CMake 4.  (Closes: #1113353)
