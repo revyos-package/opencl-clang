@@ -1,9 +1,9 @@
-opencl-clang-17 (17.0.1-2) UNRELEASED; urgency=medium
+opencl-clang-17 (17.0.1-2) unstable; urgency=medium
 
   * Merge changes from opencl-clang-16 16.0.4-1.
   * Build with g++-14.  (Closes: #1097514)
 
- -- Andreas Beckmann <anbe@debian.org>  Sat, 06 Sep 2025 22:56:06 +0200
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 07 Sep 2025 22:56:11 +0200
 
 opencl-clang-17 (17.0.1-1) unstable; urgency=medium
 
