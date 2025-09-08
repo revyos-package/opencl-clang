@@ -1,3 +1,10 @@
+opencl-clang-18 (18.1.1-2) UNRELEASED; urgency=medium
+
+  * Merge changes from opencl-clang-17 17.0.1-2.
+  * Build with g++-14.  (Closes: #1097515)
+
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 08 Sep 2025 03:31:20 +0200
+
 opencl-clang-18 (18.1.1-1) unstable; urgency=medium
 
   * New upstream release.
@@ -20,6 +27,13 @@ opencl-clang-18 (18.1.0-1) unstable; urgency=medium
   * Build with llvm 18.
 
  -- Andreas Beckmann <anbe@debian.org>  Thu, 28 Mar 2024 20:36:38 +0100
+
+opencl-clang-17 (17.0.1-2) unstable; urgency=medium
+
+  * Merge changes from opencl-clang-16 16.0.4-1.
+  * Build with g++-14.  (Closes: #1097514)
+
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 07 Sep 2025 22:56:11 +0200
 
 opencl-clang-17 (17.0.1-1) unstable; urgency=medium
 
@@ -61,6 +75,7 @@ opencl-clang-16 (16.0.4-1) UNRELEASED; urgency=medium
 
   * New upstream release.
   * Merge changes from opencl-clang-15 15.0.3-1.
+  * Build with g++-14.
 
  -- Andreas Beckmann <anbe@debian.org>  Wed, 03 Sep 2025 11:47:15 +0200
 
@@ -112,7 +127,8 @@ opencl-clang-16 (16.0.0-1) experimental; urgency=medium
 opencl-clang-15 (15.0.3-1) UNRELEASED; urgency=medium
 
   * New upstream release.
-  * Merge changes from opencl-clang-14 14.0.2-2.
+  * Merge changes from opencl-clang-14 14.0.2-3.
+  * Build with g++-14.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 02 Sep 2025 23:41:19 +0200
 
@@ -150,6 +166,12 @@ opencl-clang-15 (15.0.0-1) unstable; urgency=medium
   * Build with llvm 15.
 
  -- Andreas Beckmann <anbe@debian.org>  Tue, 04 Oct 2022 10:17:02 +0200
+
+opencl-clang-14 (14.0.2-3) unstable; urgency=medium
+
+  * Build with g++-14.  (Closes: #1114244)
+
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 06 Sep 2025 08:45:50 +0200
 
 opencl-clang-14 (14.0.2-2) unstable; urgency=medium
 
