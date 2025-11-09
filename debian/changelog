@@ -1,3 +1,13 @@
+opencl-clang-16 (16.0.5-0revyos1) unstable; urgency=medium
+
+  [ Han Gao ]
+  * New upstream release.
+
+  [ Chunyang Dai ]
+  * Add patch "[OpenCL] Add cl_khr_kernel_clock builtins" (#580)
+
+ -- Han Gao <rabenda.cn@gmail.com>  Sun, 09 Nov 2025 15:41:13 +0800
+
 opencl-clang-16 (16.0.4-1) UNRELEASED; urgency=medium
 
   * New upstream release.
